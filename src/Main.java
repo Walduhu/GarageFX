@@ -12,6 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,9 +21,42 @@ import java.util.Optional;
 
 public class Main extends Application {
 
-    public static ArrayList<Fahrzeug> alleFahrzeuge = new ArrayList<>();
+    public static ArrayList<ParkEtage> alleParkEtagen = importParkEtagenFromCSV();
+    public static ArrayList<Fahrzeug> alleFahrzeuge = importFahrzeugeFromCSV();
     public static ArrayList<Fahrzeug> geloeschteFahrzeuge = new ArrayList<>();
-    public static ArrayList<ParkEtage> alleParkEtagen = new ArrayList<>();
+    private static final String FAHRZEUG_CSV_PATH = ".\\src\\fahrzeuge.csv";
+    private static final String PARKETAGE_CSV_PATH = ".\\src\\parketagen.csv";
+
+
+    private static ArrayList<Fahrzeug> importFahrzeugeFromCSV() {
+        ArrayList<Fahrzeug> fahrzeuge = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(FAHRZEUG_CSV_PATH))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // Füge das geparste Fahrzeug der Liste hinzu
+                fahrzeuge.add(Fahrzeug.parseCSVLine(line));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return fahrzeuge;
+    }
+
+    private static ArrayList<ParkEtage> importParkEtagenFromCSV() {
+        ArrayList<ParkEtage> parkEtagen = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(PARKETAGE_CSV_PATH))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // Füge das geparste Parketage-Objekt der Liste hinzu
+                parkEtagen.add(ParkEtage.parseCSVLine(line));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return parkEtagen;
+    }
 
     public static void main(String[] args) {
         launch(args);
@@ -51,7 +86,7 @@ public class Main extends Application {
         gridPane.getStyleClass().add("scene");
 
         gridPane.add(label, 0, 0, 3, 1);
-        gridPane.add(watermarkLabel,0,4,1,1);
+        gridPane.add(watermarkLabel, 0, 4, 1, 1);
 
         gridPane.add(button1, 0, 2);
         gridPane.add(button2, 0, 3);
@@ -71,6 +106,11 @@ public class Main extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    @Override
+    public void stop() {
+        saveDataToCSV();
     }
 
     private Button createButton(String text, String styleClass) {
@@ -217,7 +257,6 @@ public class Main extends Application {
 
 
     private void addFahrzeug() {
-
         boolean fahrzeugHinzugefuegt = false; // Hilfsvariable
 
         if (!alleParkEtagen.isEmpty()) {
@@ -261,22 +300,30 @@ public class Main extends Application {
                         int rad = Integer.parseInt(radFeld.getText());
                         int leistung = Integer.parseInt(kwFeld.getText());
 
-                        int position = etage.getAnzahlGesamtParkplaetze() - etage.getAnzahlFreieParkplaetze() + 1;
-                        // falls gelöschte Fahrzeuge vorhanden sind → Position entsprechend ändern
-                        if (!geloeschteFahrzeuge.isEmpty()) {
-                            for (Fahrzeug geloeschtesFahrzeug : geloeschteFahrzeuge) {
-                                position = geloeschtesFahrzeug.getPosition();
+                        // Überprüfen, ob das Kennzeichen bereits existiert
+                        boolean kennzeichenExistiert = alleFahrzeuge.stream()
+                                .anyMatch(fahrzeug -> fahrzeug.getFahrzeugID().equalsIgnoreCase(kennzeichen));
+
+                        if (kennzeichenExistiert) {
+                            showAlert(Alert.AlertType.ERROR, "Fehler", "Kennzeichen existiert bereits.\nFahrzeug kann nicht ins Parkhaus einparken.");
+                        } else {
+                            int position = etage.getAnzahlGesamtParkplaetze() - etage.getAnzahlFreieParkplaetze() + 1;
+                            // falls gelöschte Fahrzeuge vorhanden sind → Position entsprechend ändern
+                            if (!geloeschteFahrzeuge.isEmpty()) {
+                                for (Fahrzeug geloeschtesFahrzeug : geloeschteFahrzeuge) {
+                                    position = geloeschtesFahrzeug.getPosition();
+                                }
                             }
+                            Alert alert = getAlert();
+                            Fahrzeug neuesFahrzeug = new Fahrzeug(fahrzeugArt, kennzeichen, marke, rad, leistung, etage.getEtagenBezeichnung(), position);
+                            alleFahrzeuge.add(neuesFahrzeug);
+                            etage.setAnzahlFreieParkplaetze(etage.getAnzahlFreieParkplaetze() - 1);
+                            alert.setContentText("Fahrzeug mit folgenden Daten erfolgreich eingeparkt:\n" +
+                                    "\nFahrzeugart: " + fahrzeugArt + "\nKfz-Kennzeichen: " + kennzeichen +
+                                    "\nMarkenname: " + marke + "\nAnzahl Räder: " + rad + "\nLeistung in kW: " + leistung +
+                                    "\nPark-Etage: " + etage.getEtagenBezeichnung() + "\nPosition: " + position);
+                            alert.showAndWait();
                         }
-                        Alert alert = getAlert();
-                        Fahrzeug neuesFahrzeug = new Fahrzeug(fahrzeugArt, kennzeichen, marke, rad, leistung, etage, position);
-                        alleFahrzeuge.add(neuesFahrzeug);
-                        etage.setAnzahlFreieParkplaetze(etage.getAnzahlFreieParkplaetze() - 1);
-                        alert.setContentText("Fahrzeug mit folgenden Daten erfolgreich eingeparkt:\n" +
-                                "\nFahrzeugart: " + fahrzeugArt + "\nKfz-Kennzeichen: " + kennzeichen +
-                                "\nMarkenname: " + marke + "\nAnzahl Räder: " + rad + "\nLeistung in kW: " + leistung +
-                                "\nPark-Etage: " + etage.getEtagenBezeichnung() + "\nPosition: " + position);
-                        alert.showAndWait();
                     });
                 }
             }
@@ -294,6 +341,7 @@ public class Main extends Application {
             keineEtagen();
         }
     }
+
 
     private void deleteFahrzeug() {
 
@@ -315,7 +363,7 @@ public class Main extends Application {
             result.ifPresent(selectedKennzeichen -> {
                 for (Fahrzeug fahrzeug : alleFahrzeuge) {
                     if (fahrzeug.getFahrzeugID().equals(selectedKennzeichen)) {
-                        ParkEtage etage = fahrzeug.getParkEtage();
+                        ParkEtage etage = ParkEtage.parseCSVLine(fahrzeug.getParkEtage());
                         etage.setAnzahlFreieParkplaetze(etage.getAnzahlFreieParkplaetze() + 1);
                         alleFahrzeuge.remove(fahrzeug);
                         geloeschteFahrzeuge.add(fahrzeug);
@@ -371,7 +419,7 @@ public class Main extends Application {
             for (ParkEtage etage : alleParkEtagen) {
                 choices.add(etage.getEtagenBezeichnung());
             }
-            ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
+            ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.getFirst(), choices);
 
             dialog.setTitle("Park-Etage löschen");
             dialog.setHeaderText(null);
@@ -397,7 +445,7 @@ public class Main extends Application {
                         alleParkEtagen.remove(loeschEtage);
                         for (int i = alleFahrzeuge.size() - 1; i >= 0; i--) {
                             Fahrzeug fahrzeug = alleFahrzeuge.get(i);
-                            if (fahrzeug.getParkEtage() == loeschEtage) {
+                            if (fahrzeug.getParkEtage().equals(loeschEtage.getEtagenBezeichnung())) {
                                 alleFahrzeuge.remove(i);
                             }
                         }
@@ -556,5 +604,31 @@ public class Main extends Application {
         return alert;
     }
 
+
+    private void saveDataToCSV() {
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FAHRZEUG_CSV_PATH))) {
+
+            for (Fahrzeug fahrzeug : alleFahrzeuge) {
+                writer.write(fahrzeug.toCSVFormat());
+                writer.newLine();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PARKETAGE_CSV_PATH))) {
+
+            for (ParkEtage etage : alleParkEtagen) {
+                writer.write(etage.toCSVFormat());
+                writer.newLine();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 }
 

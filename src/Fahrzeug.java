@@ -13,14 +13,14 @@ public class Fahrzeug extends Main {
     private String markenName;
     private int anzahlRaeder;
     private int leistung;// in kW
-    private ParkEtage parkEtage;
+    private String parkEtage;
     private int position;
 
     public Fahrzeug() {
     }
 
     public Fahrzeug(String fahrzeugArt, String fahrzeugID, String markenName,
-                    int anzahlRaeder, int leistung, ParkEtage parkEtage, int position) {
+                    int anzahlRaeder, int leistung, String parkEtage, int position) {
         this.fahrzeugArt = fahrzeugArt;
         this.fahrzeugID = fahrzeugID;
         this.markenName = markenName;
@@ -50,7 +50,7 @@ public class Fahrzeug extends Main {
         return leistung;
     }
 
-    public ParkEtage getParkEtage() {
+    public String getParkEtage() {
         return parkEtage;
     }
 
@@ -62,8 +62,18 @@ public class Fahrzeug extends Main {
     public String printMe() {
         return "Kennzeichen: " + getFahrzeugID() + "\nFahrzeugart: " + getFahrzeugArt() +
                 "\nMarke: " + getMarkenName() + "\nAnzahl Räder: " + getAnzahlRaeder() + "\nLeistung: " + getLeistung() + " kW" +
-                "\nPark-Etage: " + parkEtage.getEtagenBezeichnung() + "\nPosition: " + getPosition() + "\n";
+                "\nPark-Etage: " + parkEtage + "\nPosition: " + getPosition() + "\n";
     }
 
+    // Methode zur Konvertierung des Fahrzeugs in CSV-Format
+    public String toCSVFormat() {
+        return String.format("%s,%s,%s,%d,%d,%s,%d", fahrzeugArt, fahrzeugID, markenName, anzahlRaeder, leistung, parkEtage, position);
+    }
+
+    // Methode zum Parsen einer Zeile aus der CSV-Datei in ein Fahrzeug-Objekt
+    public static Fahrzeug parseCSVLine(String line) {
+        String[] parts = line.split(",");
+        return new Fahrzeug(parts[0], parts[1], parts[2], Integer.parseInt(parts[3]), Integer.parseInt(parts[4]), parts[5], Integer.parseInt(parts[6]));
+    }
 }
 

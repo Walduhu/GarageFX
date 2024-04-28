@@ -52,4 +52,15 @@ public class ParkEtage extends Main{
 
     }
 
+    // Methode zur Konvertierung der Parketage in CSV-Format
+    public String toCSVFormat() {
+        return String.format("%s,%d,%d", etagenBezeichnung, anzahlGesamtParkplaetze, anzahlFreieParkplaetze);
+    }
+
+    // Methode zum Parsen einer Zeile aus der CSV-Datei in ein Parketage-Objekt
+    public static ParkEtage parseCSVLine(String line) {
+        String[] parts = line.split(",");
+        return new ParkEtage(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+    }
+
 }

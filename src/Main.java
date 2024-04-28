@@ -1,7 +1,8 @@
 /**
  * PT Java 2. Semester
  * Projekt Garage
- * Hauptklasse des Programms
+ * Hauptklasse des Programms,
+ * implementiert das Hauptfenster des Parkhaus-Management-Systems.
  * @author Benjamin Schwarz
  * @version 28.04.24
  */
@@ -12,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,20 +21,23 @@ import java.util.Optional;
 
 public class Main extends Application {
 
+    // Initialisierung der Listen für Parketagen und Fahrzeuge
     public static ArrayList<ParkEtage> alleParkEtagen = importParkEtagenFromCSV();
     public static ArrayList<Fahrzeug> alleFahrzeuge = importFahrzeugeFromCSV();
     public static ArrayList<Fahrzeug> geloeschteFahrzeuge = new ArrayList<>();
+
+    // Pfadangaben zu den CSV-Dateien für Fahrzeuge und Parketagen
     private static final String FAHRZEUG_CSV_PATH = ".\\src\\fahrzeuge.csv";
     private static final String PARKETAGE_CSV_PATH = ".\\src\\parketagen.csv";
 
-
+    // Methoden zum Einlesen der Daten aus den CSV-Dateien
     private static ArrayList<Fahrzeug> importFahrzeugeFromCSV() {
         ArrayList<Fahrzeug> fahrzeuge = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(FAHRZEUG_CSV_PATH))) {
             String line;
             while ((line = br.readLine()) != null) {
-                // Füge das geparste Fahrzeug der Liste hinzu
+                // füge das geparste Fahrzeug-Objekt der Liste hinzu
                 fahrzeuge.add(Fahrzeug.parseCSVLine(line));
             }
         } catch (IOException e) {
@@ -49,7 +52,7 @@ public class Main extends Application {
         try (BufferedReader br = new BufferedReader(new FileReader(PARKETAGE_CSV_PATH))) {
             String line;
             while ((line = br.readLine()) != null) {
-                // Füge das geparste Parketage-Objekt der Liste hinzu
+                // füge das geparste Parketage-Objekt der Liste hinzu
                 parkEtagen.add(ParkEtage.parseCSVLine(line));
             }
         } catch (IOException e) {
@@ -58,10 +61,12 @@ public class Main extends Application {
         return parkEtagen;
     }
 
+    // Startmethode der JavaFX-Anwendung
     public static void main(String[] args) {
         launch(args);
     }
 
+    // Initialisierung der Oberfläche und Anordnung der GUI-Elemente
     @Override
     public void start(Stage primaryStage) {
 
@@ -108,11 +113,13 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    // speichern der Daten in den CSV-Dateien beim Beenden der Anwendung
     @Override
     public void stop() {
         saveDataToCSV();
     }
 
+    // Hilfsmethode zur Erstellung von Buttons mit verschiedenen Styles und Aktionen
     private Button createButton(String text, String styleClass) {
         Button button = new Button(text);
         button.getStyleClass().add(styleClass);
@@ -148,6 +155,7 @@ public class Main extends Application {
         return button;
     }
 
+    // Methode zum Suchen von Fahrzeugen anhand des Kennzeichens
     private void sucheFahrzeug() {
         if (!alleFahrzeuge.isEmpty()) {
             TextInputDialog dialog = getTextInputDialog();
@@ -201,7 +209,7 @@ public class Main extends Application {
         }
     }
 
-
+    // Methode zum Anzeigen aller im Parkhaus geparkten Fahrzeuge
     private void zeigeFahrzeuge() {
         if (!alleFahrzeuge.isEmpty()) {
             StringBuilder contentTextBuilder = new StringBuilder();
@@ -223,6 +231,7 @@ public class Main extends Application {
         }
     }
 
+    // Methode zum Anzeigen aller Parketagen im Parkhaus
     private void zeigeParkEtagen() {
         if (!alleParkEtagen.isEmpty()) {
             StringBuilder contentTextBuilder = new StringBuilder();
@@ -255,7 +264,7 @@ public class Main extends Application {
         }
     }
 
-
+    // Methode zum Hinzufügen eines neuen Fahrzeugs ins Parkhaus
     private void addFahrzeug() {
         boolean fahrzeugHinzugefuegt = false; // Hilfsvariable
 
@@ -342,7 +351,7 @@ public class Main extends Application {
         }
     }
 
-
+    // Methode zum Löschen eines Fahrzeugs aus dem Parkhaus
     private void deleteFahrzeug() {
 
         if (!alleFahrzeuge.isEmpty()) {
@@ -377,6 +386,7 @@ public class Main extends Application {
         }
     }
 
+    // Methode zum Hinzufügen einer neuen Parketage zum Parkhaus
     private void addEtage() {
 
         TextInputDialog dialog = getTextInputDialog();
@@ -410,7 +420,7 @@ public class Main extends Application {
         });
     }
 
-
+    // Methode zum Löschen einer Parketage aus dem Parkhaus
     private void deleteEtage() {
         if (!alleParkEtagen.isEmpty()) {
 
@@ -458,6 +468,7 @@ public class Main extends Application {
         }
     }
 
+    // Methode zur Konfiguration einer Parketage im Parkhaus
     private void configEtage() {
 
         if (!alleParkEtagen.isEmpty()) {
@@ -545,6 +556,7 @@ public class Main extends Application {
     }
 
 
+    // Hilfsmethode zur Erstellung eines Bestätigungsdialogs
     private static Alert getConfirmDialog(ParkEtage loeschEtage) {
         Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
         confirmDialog.setTitle("Bestätigung");
@@ -559,6 +571,7 @@ public class Main extends Application {
         return confirmDialog;
     }
 
+    // Hilfsmethode zur Anzeige von Dialogen unterschiedlicher Typen
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -569,6 +582,7 @@ public class Main extends Application {
         alert.showAndWait();
     }
 
+    // Hilfsmethoden zur Anzeige einer Warnung bei leerem Fahrzeug- oder Etage-Array
 
     private void keineFahrzeuge() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -588,6 +602,7 @@ public class Main extends Application {
         alert.showAndWait();
     }
 
+    // Hilfsmethode zur Erstellung eines TextInputDialogs
     private TextInputDialog getTextInputDialog() {
         TextInputDialog dialog = new TextInputDialog();
         Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
@@ -595,6 +610,7 @@ public class Main extends Application {
         return dialog;
     }
 
+    // Hilfsmethode zur Erstellung eines Alert-Dialogs
     private Alert getAlert() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
@@ -604,7 +620,7 @@ public class Main extends Application {
         return alert;
     }
 
-
+    // Hilfsmethode zum Speichern der Daten in den CSV-Dateien
     private void saveDataToCSV() {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FAHRZEUG_CSV_PATH))) {

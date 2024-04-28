@@ -3,6 +3,7 @@
  * Projekt Garage
  * Hauptklasse des Programms,
  * implementiert das Hauptfenster des Parkhaus-Management-Systems.
+ *
  * @author Benjamin Schwarz
  * @version 28.04.24
  */
@@ -13,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +72,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        primaryStage.setTitle("Parkhaus Management System");
+        primaryStage.setTitle("GarageFX - Parkhaus Management System");
 
         Label label = new Label("Willkommen im Parkhaus der Stadt Vence");
         label.getStyleClass().add("label1");
@@ -165,11 +167,11 @@ public class Main extends Application {
             dialog.setContentText("Bitte geben Sie ein Kennzeichen\noder Teile eines Kennzeichens ein:");
             Optional<String> suchEingabe = dialog.showAndWait();
 
-            Alert alert = getAlert();
-            StringBuilder contentTextBuilder = new StringBuilder(); // StringBuilder für gefundene Fahrzeuge
-            boolean matchesGefunden = false; // Hilfsvariable für Suchstatus
-
             if (suchEingabe.isPresent() && !suchEingabe.get().isEmpty()) {
+                Alert alert = getAlert();
+                StringBuilder contentTextBuilder = new StringBuilder(); // StringBuilder für gefundene Fahrzeuge
+                boolean matchesGefunden = false; // Hilfsvariable für Suchstatus
+
                 for (Fahrzeug kfz : alleFahrzeuge) {
                     // Kennzeichen in Kleinbuchstaben umwandeln und prüfen, ob es die Sucheingabe enthält
                     if (kfz.getFahrzeugID().toLowerCase().contains(suchEingabe.get().toLowerCase())) {
@@ -181,33 +183,36 @@ public class Main extends Application {
                         contentTextBuilder.append(kfz.printMe()).append("\n"); // Hinzufügen des gefundenen Fahrzeugs zum StringBuilder
                     }
                 }
-            } else {
-                // Keine Eingabe oder leere Eingabe
-                alert = new Alert(Alert.AlertType.WARNING);
-                Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-                alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-                alert.setHeaderText(null);
-                alert.setContentText("Die Sucheingabe darf nicht leer sein!");
-                alert.showAndWait();
-            }
 
-            if (matchesGefunden) {
-                alert.setContentText(contentTextBuilder.toString()); // Anzeigen der gefundenen Fahrzeuge
-                alert.showAndWait();
+                if (matchesGefunden) {
+                    alert.setContentText(contentTextBuilder.toString()); // Anzeigen der gefundenen Fahrzeuge
+                    alert.showAndWait();
+                } else {
+                    // keine Übereinstimmungen gefunden
+                    alert = new Alert(Alert.AlertType.WARNING);
+                    Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+                    alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+                    alert.setHeaderText(null);
+                    alert.setContentText("Es wurden keine Fahrzeug-Kennzeichen gefunden, die der Eingabe \"" +
+                            suchEingabe.orElse("") + "\" entsprechen.");
+                    alert.showAndWait();
+                }
             } else {
-                // Keine Übereinstimmungen gefunden
-                alert = new Alert(Alert.AlertType.WARNING);
-                Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-                alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-                alert.setHeaderText(null);
-                alert.setContentText("Es wurden keine Fahrzeug-Kennzeichen gefunden, die der Eingabe \"" +
-                        suchEingabe.orElse("") + "\" entsprechen.");
-                alert.showAndWait();
+                // keine oder leere Eingabe
+                if (suchEingabe.isPresent()) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+                    alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+                    alert.setHeaderText(null);
+                    alert.setContentText("Die Sucheingabe darf nicht leer sein!");
+                    alert.showAndWait();
+                }
             }
         } else {
             keineFahrzeuge();
         }
     }
+
 
     // Methode zum Anzeigen aller im Parkhaus geparkten Fahrzeuge
     private void zeigeFahrzeuge() {
@@ -269,382 +274,396 @@ public class Main extends Application {
         boolean fahrzeugHinzugefuegt = false; // Hilfsvariable
 
         if (!alleParkEtagen.isEmpty()) {
-            for (ParkEtage etage : alleParkEtagen) {
-                if (etage.getAnzahlFreieParkplaetze() > 0) {
-                    fahrzeugHinzugefuegt = true; // Aktualisierung der Hilfsvariable
-                    TextInputDialog dialog = getTextInputDialog();
-                    dialog.setTitle("Fahrzeug fährt ins Parkhaus...");
-                    dialog.setHeaderText(null);
+            ParkEtage etage = alleParkEtagen.getFirst(); // Nur eine Etage anzeigen, da die Eingabe unabhängig von der Etage ist
+            if (etage.getAnzahlFreieParkplaetze() > 0) {
+                fahrzeugHinzugefuegt = true; // Aktualisierung der Hilfsvariable
 
-                    GridPane gridPane = new GridPane();
-                    gridPane.setHgap(10);
-                    gridPane.setVgap(10);
+                // Code für das Hinzufügen eines Fahrzeugs hier
+                TextInputDialog dialog = getTextInputDialog();
+                dialog.setTitle("Fahrzeug fährt ins Parkhaus...");
+                dialog.setHeaderText(null);
 
-                    gridPane.add(new Label("Fahrzeugart:"), 0, 0);
-                    TextField fahrzeugArtFeld = new TextField();
-                    gridPane.add(fahrzeugArtFeld, 1, 0);
+                GridPane gridPane = new GridPane();
+                gridPane.setHgap(10);
+                gridPane.setVgap(10);
 
-                    gridPane.add(new Label("Kfz-Kennzeichen:"), 0, 1);
-                    TextField kennzeichenFeld = new TextField();
-                    gridPane.add(kennzeichenFeld, 1, 1);
+                gridPane.add(new Label("Fahrzeugart:"), 0, 0);
+                TextField fahrzeugArtFeld = new TextField();
+                gridPane.add(fahrzeugArtFeld, 1, 0);
 
-                    gridPane.add(new Label("Markenname:"), 0, 2);
-                    TextField markenFeld = new TextField();
-                    gridPane.add(markenFeld, 1, 2);
+                gridPane.add(new Label("Kfz-Kennzeichen:"), 0, 1);
+                TextField kennzeichenFeld = new TextField();
+                gridPane.add(kennzeichenFeld, 1, 1);
 
-                    gridPane.add(new Label("Anzahl Räder:"), 0, 3);
-                    TextField radFeld = new TextField();
-                    gridPane.add(radFeld, 1, 3);
+                gridPane.add(new Label("Markenname:"), 0, 2);
+                TextField markenFeld = new TextField();
+                gridPane.add(markenFeld, 1, 2);
 
-                    gridPane.add(new Label("Leistung in kW:"), 0, 4);
-                    TextField kwFeld = new TextField();
-                    gridPane.add(kwFeld, 1, 4);
+                gridPane.add(new Label("Anzahl Räder:"), 0, 3);
+                TextField radFeld = new TextField();
+                gridPane.add(radFeld, 1, 3);
 
-                    dialog.getDialogPane().setContent(gridPane);
+                gridPane.add(new Label("Leistung in kW:"), 0, 4);
+                TextField kwFeld = new TextField();
+                gridPane.add(kwFeld, 1, 4);
 
-                    dialog.showAndWait().ifPresent(result -> {
-                        String fahrzeugArt = fahrzeugArtFeld.getText();
-                        String kennzeichen = kennzeichenFeld.getText();
-                        String marke = markenFeld.getText();
-                        int rad = Integer.parseInt(radFeld.getText());
-                        int leistung = Integer.parseInt(kwFeld.getText());
+                dialog.getDialogPane().setContent(gridPane);
 
-                        // Überprüfen, ob das Kennzeichen bereits existiert
-                        boolean kennzeichenExistiert = alleFahrzeuge.stream()
-                                .anyMatch(fahrzeug -> fahrzeug.getFahrzeugID().equalsIgnoreCase(kennzeichen));
+                dialog.showAndWait().ifPresent(result -> {
+                    String fahrzeugArt = fahrzeugArtFeld.getText();
+                    String kennzeichen = kennzeichenFeld.getText();
+                    String marke = markenFeld.getText();
+                    int rad = Integer.parseInt(radFeld.getText());
+                    int leistung = Integer.parseInt(kwFeld.getText());
 
-                        if (kennzeichenExistiert) {
-                            showAlert(Alert.AlertType.ERROR, "Fehler", "Kennzeichen existiert bereits.\nFahrzeug kann nicht ins Parkhaus einparken.");
-                        } else {
-                            int position = etage.getAnzahlGesamtParkplaetze() - etage.getAnzahlFreieParkplaetze() + 1;
-                            // falls gelöschte Fahrzeuge vorhanden sind → Position entsprechend ändern
-                            if (!geloeschteFahrzeuge.isEmpty()) {
-                                for (Fahrzeug geloeschtesFahrzeug : geloeschteFahrzeuge) {
-                                    position = geloeschtesFahrzeug.getPosition();
-                                }
+                    boolean kennzeichenExistiert = alleFahrzeuge.stream()
+                            .anyMatch(fahrzeug -> fahrzeug.getFahrzeugID().equalsIgnoreCase(kennzeichen));
+
+                    if (!kennzeichenExistiert) {
+                        // Überprüfen, ob die Position bereits von einem anderen Fahrzeug besetzt ist
+                        int position = -1;
+                        for (Fahrzeug geloeschtesFahrzeug : geloeschteFahrzeuge) {
+                            if (alleFahrzeuge.stream().noneMatch(fahrzeug -> fahrzeug.getPosition() == geloeschtesFahrzeug.getPosition()
+                                    && fahrzeug.getParkEtage().equals(geloeschtesFahrzeug.getParkEtage()))) {
+                                position = geloeschtesFahrzeug.getPosition();
+                                break;
                             }
-                            Alert alert = getAlert();
-                            Fahrzeug neuesFahrzeug = new Fahrzeug(fahrzeugArt, kennzeichen, marke, rad, leistung, etage.getEtagenBezeichnung(), position);
-                            alleFahrzeuge.add(neuesFahrzeug);
-                            etage.setAnzahlFreieParkplaetze(etage.getAnzahlFreieParkplaetze() - 1);
-                            alert.setContentText("Fahrzeug mit folgenden Daten erfolgreich eingeparkt:\n" +
-                                    "\nFahrzeugart: " + fahrzeugArt + "\nKfz-Kennzeichen: " + kennzeichen +
-                                    "\nMarkenname: " + marke + "\nAnzahl Räder: " + rad + "\nLeistung in kW: " + leistung +
-                                    "\nPark-Etage: " + etage.getEtagenBezeichnung() + "\nPosition: " + position);
-                            alert.showAndWait();
+                        }
+
+                        if (position == -1) {
+                            position = etage.getAnzahlGesamtParkplaetze() - etage.getAnzahlFreieParkplaetze() + 1;
+                        }
+
+                        Alert alert = getAlert();
+                        Fahrzeug neuesFahrzeug = new Fahrzeug(fahrzeugArt, kennzeichen, marke, rad, leistung, etage.getEtagenBezeichnung(), position);
+                        alleFahrzeuge.add(neuesFahrzeug);
+                        etage.setAnzahlFreieParkplaetze(etage.getAnzahlFreieParkplaetze() - 1);
+                        alert.setContentText("Fahrzeug mit folgenden Daten erfolgreich eingeparkt:\n" +
+                                "\nFahrzeugart: " + fahrzeugArt + "\nKfz-Kennzeichen: " + kennzeichen +
+                                "\nMarkenname: " + marke + "\nAnzahl Räder: " + rad + "\nLeistung in kW: " + leistung +
+                                "\nPark-Etage: " + etage.getEtagenBezeichnung() + "\nPosition: " + position);
+                        alert.showAndWait();
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Fehler", "Kennzeichen existiert bereits." +
+                                "\nFahrzeug kann nicht ins Parkhaus einparken.");
+                    }
+                });
+            }
+        }
+
+        if (!fahrzeugHinzugefuegt) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+            alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+            alert.setHeaderText(null);
+            alert.setContentText("Fahrzeug abgelehnt. Es sind keine freien Parkplätze verfügbar." +
+                    "\nBitte fügen Sie Park-Etagen zum Parkhaus hinzu.");
+            alert.showAndWait();
+        }
+    }
+
+
+
+
+// Methode zum Löschen eines Fahrzeugs aus dem Parkhaus
+private void deleteFahrzeug() {
+
+    if (!alleFahrzeuge.isEmpty()) {
+        List<String> choices = new ArrayList<>();
+        for (Fahrzeug fahrzeug : alleFahrzeuge) {
+            choices.add(fahrzeug.getFahrzeugID());
+        }
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.getFirst(), choices);
+
+        dialog.setTitle("Fahrzeug aus dem Parkhaus entfernen");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Welches Fahrzeug möchten Sie aus dem Parkhaus entfernen?");
+        Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        dialogStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+
+        Optional<String> result = dialog.showAndWait();
+
+        result.ifPresent(selectedKennzeichen -> {
+            for (Fahrzeug fahrzeug : alleFahrzeuge) {
+                if (fahrzeug.getFahrzeugID().equals(selectedKennzeichen)) {
+                    for (ParkEtage etage : alleParkEtagen) {
+                        if (etage.getEtagenBezeichnung().equals(fahrzeug.getParkEtage())) {
+                            etage.setAnzahlFreieParkplaetze(etage.getAnzahlFreieParkplaetze() + 1);
+                            alleFahrzeuge.remove(fahrzeug);
+                            geloeschteFahrzeuge.add(fahrzeug);
+                            showAlert(Alert.AlertType.INFORMATION, "Information", "Fahrzeug erfolgreich ausgeparkt.");
+                            break; // beenden der inneren Schleife, sobald eine Übereinstimmung gefunden wurde
+                        }
+                    }
+                    break; // beenden der äußeren Schleife, sobald das Fahrzeug gefunden wurde
+                }
+            }
+        });
+
+    } else {
+        keineFahrzeuge();
+    }
+}
+
+// Methode zum Hinzufügen einer neuen Parketage zum Parkhaus
+private void addEtage() {
+
+    TextInputDialog dialog = getTextInputDialog();
+    dialog.setTitle("Etage hinzufügen");
+    dialog.setHeaderText(null);
+
+    GridPane gridPane = new GridPane();
+    gridPane.setHgap(10);
+    gridPane.setVgap(10);
+
+    gridPane.add(new Label("Bezeichnung"), 0, 0);
+    TextField bezeichnungFeld = new TextField();
+    gridPane.add(bezeichnungFeld, 1, 0);
+
+    gridPane.add(new Label("Anzahl Parkplätze:"), 0, 1);
+    TextField parkplatzFeld = new TextField();
+    gridPane.add(parkplatzFeld, 1, 1);
+
+    dialog.getDialogPane().setContent(gridPane);
+
+    dialog.showAndWait().ifPresent(result -> {
+        String bezeichnung = bezeichnungFeld.getText();
+        int parkplaetze = Integer.parseInt(parkplatzFeld.getText());
+
+        Alert alert = getAlert();
+        alert.setContentText("Etage mit folgenden Daten erfolgreich hinzugefügt:\n" +
+                "\nBezeichnung: " + bezeichnung + "\nAnzahl Parkplätze: " + parkplaetze);
+        ParkEtage etage = new ParkEtage(bezeichnung, parkplaetze, parkplaetze);
+        alleParkEtagen.add(etage);
+        alert.showAndWait();
+    });
+}
+
+// Methode zum Löschen einer Parketage aus dem Parkhaus
+private void deleteEtage() {
+    if (!alleParkEtagen.isEmpty()) {
+
+        // Etagenauswahl
+        List<String> choices = new ArrayList<>();
+        for (ParkEtage etage : alleParkEtagen) {
+            choices.add(etage.getEtagenBezeichnung());
+        }
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.getFirst(), choices);
+
+        dialog.setTitle("Park-Etage löschen");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Welche Etage möchten Sie aus dem Parkhaus entfernen?");
+        Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        dialogStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+
+        Optional<String> result = dialog.showAndWait();
+
+        result.ifPresent(selectedEtage -> {
+            ParkEtage loeschEtage = null;
+            for (ParkEtage etage : alleParkEtagen) {
+                if (etage.getEtagenBezeichnung().equals(selectedEtage)) {
+                    loeschEtage = etage;
+                    break;
+                }
+            }
+
+            if (loeschEtage != null) {
+                Alert confirmDialog = getConfirmDialog(loeschEtage);
+                Optional<ButtonType> confirmResult = confirmDialog.showAndWait();
+                if (confirmResult.isPresent() && confirmResult.get() == ButtonType.OK) {
+                    alleParkEtagen.remove(loeschEtage);
+                    for (int i = alleFahrzeuge.size() - 1; i >= 0; i--) {
+                        Fahrzeug fahrzeug = alleFahrzeuge.get(i);
+                        if (fahrzeug.getParkEtage().equals(loeschEtage.getEtagenBezeichnung())) {
+                            alleFahrzeuge.remove(i);
+                        }
+                    }
+                    showAlert(Alert.AlertType.INFORMATION, "Etage erfolgreich entfernt", "Etage erfolgreich entfernt.");
+                }
+            }
+        });
+    } else {
+        keineEtagen();
+    }
+}
+
+// Methode zur Konfiguration einer Parketage im Parkhaus
+private void configEtage() {
+
+    if (!alleParkEtagen.isEmpty()) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Park-Etage konfigurieren");
+        alert.setHeaderText(null);
+        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+        alert.setContentText("Welche Etage möchten Sie konfigurieren?");
+
+        // Erstellen der Liste für die Auswahl der Etage
+        List<String> choices = new ArrayList<>();
+        for (ParkEtage etage : alleParkEtagen) {
+            choices.add(etage.getEtagenBezeichnung());
+        }
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.getFirst(), choices);
+        dialog.setTitle("Park-Etage auswählen");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Welche Etage möchten Sie konfigurieren?");
+        Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        dialogStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+        Optional<String> result = dialog.showAndWait();
+
+        result.ifPresent(selectedEtage -> {
+            ParkEtage configEtage = alleParkEtagen.stream().filter(etage -> etage.getEtagenBezeichnung().equals(selectedEtage)).findFirst().orElse(null);
+
+            if (configEtage != null) {
+                TextInputDialog textInputDialog = new TextInputDialog(configEtage.getEtagenBezeichnung());
+                textInputDialog.setTitle("Bezeichnung ändern");
+                textInputDialog.setHeaderText(null);
+                Stage textInputStage1 = (Stage) textInputDialog.getDialogPane().getScene().getWindow();
+                textInputStage1.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+                textInputDialog.setContentText("Geben Sie die neue Bezeichnung der Etage ein:");
+                Optional<String> newBezeichnungResult = textInputDialog.showAndWait();
+
+                newBezeichnungResult.ifPresent(configEtage::setEtagenBezeichnung);
+
+                if (configEtage.getAnzahlFreieParkplaetze() == configEtage.getAnzahlGesamtParkplaetze()) {
+                    TextInputDialog anzahlParkplaetzeDialog = new TextInputDialog(String.valueOf(configEtage.getAnzahlGesamtParkplaetze()));
+                    anzahlParkplaetzeDialog.setTitle("Anzahl Parkplätze ändern");
+                    anzahlParkplaetzeDialog.setHeaderText(null);
+                    Stage textInputStage2 = (Stage) anzahlParkplaetzeDialog.getDialogPane().getScene().getWindow();
+                    textInputStage2.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+                    anzahlParkplaetzeDialog.setContentText("Geben Sie die neue Anzahl der Parkplätze ein:");
+                    Optional<String> newAnzahlParkplaetzeResult = anzahlParkplaetzeDialog.showAndWait();
+
+                    newAnzahlParkplaetzeResult.ifPresent(newAnzahl -> {
+                        try {
+                            int anzahlParkplaetze = Integer.parseInt(newAnzahl);
+                            configEtage.setAnzahlGesamtParkplaetze(anzahlParkplaetze);
+                            configEtage.setAnzahlFreieParkplaetze(anzahlParkplaetze);
+                        } catch (NumberFormatException e) {
+                            showAlert(Alert.AlertType.ERROR, "Fehler", "Ungültige Eingabe. Bitte geben Sie eine Zahl ein.");
+                        }
+                    });
+                } else {
+                    int anzahlFahrzeuge = configEtage.getAnzahlGesamtParkplaetze() - configEtage.getAnzahlFreieParkplaetze();
+                    TextInputDialog anzahlParkplaetzeDialog = new TextInputDialog(String.valueOf(configEtage.getAnzahlGesamtParkplaetze()));
+                    anzahlParkplaetzeDialog.setTitle("Anzahl Parkplätze ändern");
+                    anzahlParkplaetzeDialog.setHeaderText(null);
+                    anzahlParkplaetzeDialog.setContentText("Geben Sie die neue Anzahl Parkplätze ein (Es sind " + anzahlFahrzeuge + " Fahrzeuge geparkt):");
+                    Optional<String> newAnzahlParkplaetzeResult = anzahlParkplaetzeDialog.showAndWait();
+
+                    newAnzahlParkplaetzeResult.ifPresent(newAnzahl -> {
+                        try {
+                            int anzahlParkplaetze = Integer.parseInt(newAnzahl);
+                            if (anzahlParkplaetze >= anzahlFahrzeuge) {
+                                configEtage.setAnzahlGesamtParkplaetze(anzahlParkplaetze);
+                                configEtage.setAnzahlFreieParkplaetze(anzahlParkplaetze - anzahlFahrzeuge);
+                            } else {
+                                showAlert(Alert.AlertType.WARNING, "Ungültige Eingabe", "Anzahl Parkplätze ist zu niedrig. Geben Sie mindestens " + anzahlFahrzeuge + " ein.");
+                                configEtage();
+                            }
+                        } catch (NumberFormatException e) {
+                            showAlert(Alert.AlertType.ERROR, "Fehler", "Ungültige Eingabe. Bitte geben Sie eine Zahl ein.");
                         }
                     });
                 }
+                showAlert(Alert.AlertType.INFORMATION, "Information", "Etage erfolgreich geändert.");
             }
-
-            if (!fahrzeugHinzugefuegt) {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-                alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-                alert.setHeaderText(null);
-                alert.setContentText("Fahrzeug abgelehnt. Es sind keine freien Parkplätze verfügbar." +
-                        "\nBitte fügen Sie Park-Etagen zum Parkhaus hinzu.");
-                alert.showAndWait();
-            }
-        } else {
-            keineEtagen();
-        }
-    }
-
-    // Methode zum Löschen eines Fahrzeugs aus dem Parkhaus
-    private void deleteFahrzeug() {
-
-        if (!alleFahrzeuge.isEmpty()) {
-            List<String> choices = new ArrayList<>();
-            for (Fahrzeug fahrzeug : alleFahrzeuge) {
-                choices.add(fahrzeug.getFahrzeugID());
-            }
-            ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.getFirst(), choices);
-
-            dialog.setTitle("Fahrzeug aus dem Parkhaus entfernen");
-            dialog.setHeaderText(null);
-            dialog.setContentText("Welches Fahrzeug möchten Sie aus dem Parkhaus entfernen?");
-            Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
-            dialogStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-
-            Optional<String> result = dialog.showAndWait();
-
-            result.ifPresent(selectedKennzeichen -> {
-                for (Fahrzeug fahrzeug : alleFahrzeuge) {
-                    if (fahrzeug.getFahrzeugID().equals(selectedKennzeichen)) {
-                        ParkEtage etage = ParkEtage.parseCSVLine(fahrzeug.getParkEtage());
-                        etage.setAnzahlFreieParkplaetze(etage.getAnzahlFreieParkplaetze() + 1);
-                        alleFahrzeuge.remove(fahrzeug);
-                        geloeschteFahrzeuge.add(fahrzeug);
-                        showAlert(Alert.AlertType.INFORMATION, "Information", "Fahrzeug erfolgreich ausgeparkt.");
-                        return;
-                    }
-                }
-            });
-        } else {
-            keineFahrzeuge();
-        }
-    }
-
-    // Methode zum Hinzufügen einer neuen Parketage zum Parkhaus
-    private void addEtage() {
-
-        TextInputDialog dialog = getTextInputDialog();
-        dialog.setTitle("Etage hinzufügen");
-        dialog.setHeaderText(null);
-
-        GridPane gridPane = new GridPane();
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
-
-        gridPane.add(new Label("Bezeichnung"), 0, 0);
-        TextField bezeichnungFeld = new TextField();
-        gridPane.add(bezeichnungFeld, 1, 0);
-
-        gridPane.add(new Label("Anzahl Parkplätze:"), 0, 1);
-        TextField parkplatzFeld = new TextField();
-        gridPane.add(parkplatzFeld, 1, 1);
-
-        dialog.getDialogPane().setContent(gridPane);
-
-        dialog.showAndWait().ifPresent(result -> {
-            String bezeichnung = bezeichnungFeld.getText();
-            int parkplaetze = Integer.parseInt(parkplatzFeld.getText());
-
-            Alert alert = getAlert();
-            alert.setContentText("Etage mit folgenden Daten erfolgreich hinzugefügt:\n" +
-                    "\nBezeichnung: " + bezeichnung + "\nAnzahl Parkplätze: " + parkplaetze);
-            ParkEtage etage = new ParkEtage(bezeichnung, parkplaetze, parkplaetze);
-            alleParkEtagen.add(etage);
-            alert.showAndWait();
         });
+    } else {
+        keineEtagen();
     }
-
-    // Methode zum Löschen einer Parketage aus dem Parkhaus
-    private void deleteEtage() {
-        if (!alleParkEtagen.isEmpty()) {
-
-            // Etagenauswahl
-            List<String> choices = new ArrayList<>();
-            for (ParkEtage etage : alleParkEtagen) {
-                choices.add(etage.getEtagenBezeichnung());
-            }
-            ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.getFirst(), choices);
-
-            dialog.setTitle("Park-Etage löschen");
-            dialog.setHeaderText(null);
-            dialog.setContentText("Welche Etage möchten Sie aus dem Parkhaus entfernen?");
-            Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
-            dialogStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-
-            Optional<String> result = dialog.showAndWait();
-
-            result.ifPresent(selectedEtage -> {
-                ParkEtage loeschEtage = null;
-                for (ParkEtage etage : alleParkEtagen) {
-                    if (etage.getEtagenBezeichnung().equals(selectedEtage)) {
-                        loeschEtage = etage;
-                        break;
-                    }
-                }
-
-                if (loeschEtage != null) {
-                    Alert confirmDialog = getConfirmDialog(loeschEtage);
-                    Optional<ButtonType> confirmResult = confirmDialog.showAndWait();
-                    if (confirmResult.isPresent() && confirmResult.get() == ButtonType.OK) {
-                        alleParkEtagen.remove(loeschEtage);
-                        for (int i = alleFahrzeuge.size() - 1; i >= 0; i--) {
-                            Fahrzeug fahrzeug = alleFahrzeuge.get(i);
-                            if (fahrzeug.getParkEtage().equals(loeschEtage.getEtagenBezeichnung())) {
-                                alleFahrzeuge.remove(i);
-                            }
-                        }
-                        showAlert(Alert.AlertType.INFORMATION, "Etage erfolgreich entfernt", "Etage erfolgreich entfernt.");
-                    }
-                }
-            });
-        } else {
-            keineEtagen();
-        }
-    }
-
-    // Methode zur Konfiguration einer Parketage im Parkhaus
-    private void configEtage() {
-
-        if (!alleParkEtagen.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Park-Etage konfigurieren");
-            alert.setHeaderText(null);
-            Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-            alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-            alert.setContentText("Welche Etage möchten Sie konfigurieren?");
-
-            // Erstellen der Liste für die Auswahl der Etage
-            List<String> choices = new ArrayList<>();
-            for (ParkEtage etage : alleParkEtagen) {
-                choices.add(etage.getEtagenBezeichnung());
-            }
-            ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.getFirst(), choices);
-            dialog.setTitle("Park-Etage auswählen");
-            dialog.setHeaderText(null);
-            dialog.setContentText("Welche Etage möchten Sie konfigurieren?");
-            Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
-            dialogStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-            Optional<String> result = dialog.showAndWait();
-
-            result.ifPresent(selectedEtage -> {
-                ParkEtage configEtage = alleParkEtagen.stream().filter(etage -> etage.getEtagenBezeichnung().equals(selectedEtage)).findFirst().orElse(null);
-
-                if (configEtage != null) {
-                    TextInputDialog textInputDialog = new TextInputDialog(configEtage.getEtagenBezeichnung());
-                    textInputDialog.setTitle("Bezeichnung ändern");
-                    textInputDialog.setHeaderText(null);
-                    Stage textInputStage1 = (Stage) textInputDialog.getDialogPane().getScene().getWindow();
-                    textInputStage1.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-                    textInputDialog.setContentText("Geben Sie die neue Bezeichnung der Etage ein:");
-                    Optional<String> newBezeichnungResult = textInputDialog.showAndWait();
-
-                    newBezeichnungResult.ifPresent(configEtage::setEtagenBezeichnung);
-
-                    if (configEtage.getAnzahlFreieParkplaetze() == configEtage.getAnzahlGesamtParkplaetze()) {
-                        TextInputDialog anzahlParkplaetzeDialog = new TextInputDialog(String.valueOf(configEtage.getAnzahlGesamtParkplaetze()));
-                        anzahlParkplaetzeDialog.setTitle("Anzahl Parkplätze ändern");
-                        anzahlParkplaetzeDialog.setHeaderText(null);
-                        Stage textInputStage2 = (Stage) anzahlParkplaetzeDialog.getDialogPane().getScene().getWindow();
-                        textInputStage2.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-                        anzahlParkplaetzeDialog.setContentText("Geben Sie die neue Anzahl der Parkplätze ein:");
-                        Optional<String> newAnzahlParkplaetzeResult = anzahlParkplaetzeDialog.showAndWait();
-
-                        newAnzahlParkplaetzeResult.ifPresent(newAnzahl -> {
-                            try {
-                                int anzahlParkplaetze = Integer.parseInt(newAnzahl);
-                                configEtage.setAnzahlGesamtParkplaetze(anzahlParkplaetze);
-                                configEtage.setAnzahlFreieParkplaetze(anzahlParkplaetze);
-                            } catch (NumberFormatException e) {
-                                showAlert(Alert.AlertType.ERROR, "Fehler", "Ungültige Eingabe. Bitte geben Sie eine Zahl ein.");
-                            }
-                        });
-                    } else {
-                        int anzahlFahrzeuge = configEtage.getAnzahlGesamtParkplaetze() - configEtage.getAnzahlFreieParkplaetze();
-                        TextInputDialog anzahlParkplaetzeDialog = new TextInputDialog(String.valueOf(configEtage.getAnzahlGesamtParkplaetze()));
-                        anzahlParkplaetzeDialog.setTitle("Anzahl Parkplätze ändern");
-                        anzahlParkplaetzeDialog.setHeaderText(null);
-                        anzahlParkplaetzeDialog.setContentText("Geben Sie die neue Anzahl Parkplätze ein (Es sind " + anzahlFahrzeuge + " Fahrzeuge geparkt):");
-                        Optional<String> newAnzahlParkplaetzeResult = anzahlParkplaetzeDialog.showAndWait();
-
-                        newAnzahlParkplaetzeResult.ifPresent(newAnzahl -> {
-                            try {
-                                int anzahlParkplaetze = Integer.parseInt(newAnzahl);
-                                if (anzahlParkplaetze >= anzahlFahrzeuge) {
-                                    configEtage.setAnzahlGesamtParkplaetze(anzahlParkplaetze);
-                                    configEtage.setAnzahlFreieParkplaetze(anzahlParkplaetze - anzahlFahrzeuge);
-                                } else {
-                                    showAlert(Alert.AlertType.WARNING, "Ungültige Eingabe", "Anzahl Parkplätze ist zu niedrig. Geben Sie mindestens " + anzahlFahrzeuge + " ein.");
-                                    configEtage();
-                                }
-                            } catch (NumberFormatException e) {
-                                showAlert(Alert.AlertType.ERROR, "Fehler", "Ungültige Eingabe. Bitte geben Sie eine Zahl ein.");
-                            }
-                        });
-                    }
-                    showAlert(Alert.AlertType.INFORMATION, "Information", "Etage erfolgreich geändert.");
-                }
-            });
-        } else {
-            keineEtagen();
-        }
-    }
+}
 
 
-    // Hilfsmethode zur Erstellung eines Bestätigungsdialogs
-    private static Alert getConfirmDialog(ParkEtage loeschEtage) {
-        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmDialog.setTitle("Bestätigung");
-        confirmDialog.setHeaderText(null);
-        Stage alertStage = (Stage) confirmDialog.getDialogPane().getScene().getWindow();
-        alertStage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("car_icon.png"))));
-        confirmDialog.setContentText(loeschEtage.getAnzahlFreieParkplaetze() == loeschEtage.getAnzahlGesamtParkplaetze() ?
-                "Möchten Sie wirklich die leere Etage entfernen?" :
-                "Möchten Sie wirklich die Etage mitsamt der dort geparkten Fahrzeuge (Anzahl: " +
-                        (loeschEtage.getAnzahlGesamtParkplaetze() - loeschEtage.getAnzahlFreieParkplaetze()) +
-                        ") löschen?");
-        return confirmDialog;
-    }
+// Hilfsmethode zur Erstellung eines Bestätigungsdialogs
+private static Alert getConfirmDialog(ParkEtage loeschEtage) {
+    Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+    confirmDialog.setTitle("Bestätigung");
+    confirmDialog.setHeaderText(null);
+    Stage alertStage = (Stage) confirmDialog.getDialogPane().getScene().getWindow();
+    alertStage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("car_icon.png"))));
+    confirmDialog.setContentText(loeschEtage.getAnzahlFreieParkplaetze() == loeschEtage.getAnzahlGesamtParkplaetze() ?
+            "Möchten Sie wirklich die leere Etage entfernen?" :
+            "Möchten Sie wirklich die Etage mitsamt der dort geparkten Fahrzeuge (Anzahl: " +
+                    (loeschEtage.getAnzahlGesamtParkplaetze() - loeschEtage.getAnzahlFreieParkplaetze()) +
+                    ") löschen?");
+    return confirmDialog;
+}
 
-    // Hilfsmethode zur Anzeige von Dialogen unterschiedlicher Typen
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
+// Hilfsmethode zur Anzeige von Dialogen unterschiedlicher Typen
+private void showAlert(Alert.AlertType type, String title, String content) {
+    Alert alert = new Alert(type);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+    alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+    alert.setContentText(content);
+    alert.showAndWait();
+}
 
-    // Hilfsmethoden zur Anzeige einer Warnung bei leerem Fahrzeug- oder Etage-Array
+// Hilfsmethoden zur Anzeige einer Warnung bei leerem Fahrzeug- oder Etage-Array
 
-    private void keineFahrzeuge() {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-        alert.setHeaderText(null);
-        alert.setContentText("Es befinden sich noch keine Fahrzeuge im Parkhaus!");
-        alert.showAndWait();
-    }
+private void keineFahrzeuge() {
+    Alert alert = new Alert(Alert.AlertType.WARNING);
+    Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+    alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+    alert.setHeaderText(null);
+    alert.setContentText("Es befinden sich noch keine Fahrzeuge im Parkhaus!");
+    alert.showAndWait();
+}
 
-    private void keineEtagen() {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-        alert.setHeaderText(null);
-        alert.setContentText("Das Parkhaus hat noch keine Etagen!");
-        alert.showAndWait();
-    }
+private void keineEtagen() {
+    Alert alert = new Alert(Alert.AlertType.WARNING);
+    Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+    alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+    alert.setHeaderText(null);
+    alert.setContentText("Das Parkhaus hat noch keine Etagen!");
+    alert.showAndWait();
+}
 
-    // Hilfsmethode zur Erstellung eines TextInputDialogs
-    private TextInputDialog getTextInputDialog() {
-        TextInputDialog dialog = new TextInputDialog();
-        Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
-        dialogStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-        return dialog;
-    }
+// Hilfsmethode zur Erstellung eines TextInputDialogs
+private TextInputDialog getTextInputDialog() {
+    TextInputDialog dialog = new TextInputDialog();
+    Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+    dialogStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+    return dialog;
+}
 
-    // Hilfsmethode zur Erstellung eines Alert-Dialogs
-    private Alert getAlert() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
-        alert.setHeaderText(null);
-        alert.setTitle("Information");
-        return alert;
-    }
+// Hilfsmethode zur Erstellung eines Alert-Dialogs
+private Alert getAlert() {
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+    alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+    alert.setHeaderText(null);
+    alert.setTitle("Information");
+    return alert;
+}
 
-    // Hilfsmethode zum Speichern der Daten in den CSV-Dateien
-    private void saveDataToCSV() {
+// Hilfsmethode zum Speichern der Daten in den CSV-Dateien
+private void saveDataToCSV() {
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FAHRZEUG_CSV_PATH))) {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(FAHRZEUG_CSV_PATH))) {
 
-            for (Fahrzeug fahrzeug : alleFahrzeuge) {
-                writer.write(fahrzeug.toCSVFormat());
-                writer.newLine();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (Fahrzeug fahrzeug : alleFahrzeuge) {
+            writer.write(fahrzeug.toCSVFormat());
+            writer.newLine();
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PARKETAGE_CSV_PATH))) {
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
 
-            for (ParkEtage etage : alleParkEtagen) {
-                writer.write(etage.toCSVFormat());
-                writer.newLine();
-            }
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(PARKETAGE_CSV_PATH))) {
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (ParkEtage etage : alleParkEtagen) {
+            writer.write(etage.toCSVFormat());
+            writer.newLine();
         }
 
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+
+}
 }
 

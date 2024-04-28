@@ -62,7 +62,7 @@ public class Fahrzeug extends Main {
     public String printMe() {
         return "Kennzeichen: " + getFahrzeugID() + "\nFahrzeugart: " + getFahrzeugArt() +
                 "\nMarke: " + getMarkenName() + "\nAnzahl Räder: " + getAnzahlRaeder() + "\nLeistung: " + getLeistung() + " kW" +
-                "\nPark-Etage: " + parkEtage + "\nPosition: " + getPosition() + "\n";
+                "\nPark-Etage: " + getParkEtage() + "\nPosition: " + getPosition() + "\n";
     }
 
     // Methode zur Konvertierung des Fahrzeugs in CSV-Format

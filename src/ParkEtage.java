@@ -12,9 +12,6 @@ public class ParkEtage extends Main{
     private int anzahlFreieParkplaetze;
     private int anzahlGesamtParkplaetze;
 
-    public ParkEtage() {
-    }
-
     public ParkEtage(String etagenBezeichnung, int anzahlFreieParkplaetze, int anzahlGesamtParkplaetze) {
         this.etagenBezeichnung = etagenBezeichnung;
         this.anzahlFreieParkplaetze = anzahlFreieParkplaetze;

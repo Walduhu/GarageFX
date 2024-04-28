@@ -1,0 +1,71 @@
+.scene {
+    -fx-background-color: #282828;
+    -fx-text-fill: white;
+    -fx-padding: 15px 15px 15px 15px;
+}
+
+.label1 {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: Verdana;
+    -fx-border-color: #a3a5a9;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-padding: 10px;
+    -fx-background-color: #0000551a;
+    -fx-background-radius: 10px;
+}
+
+.button {
+    -fx-font-size: 13px;
+    -fx-font-family: Verdana;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-min-width: 300px;
+    -fx-max-width: 300px;
+    -fx-min-height: 40px;
+    -fx-max-height: 40px;
+}
+
+
+.blueButtons {
+    -fx-background-color: #0079ff;
+    -fx-text-fill: white;
+}
+
+.blueButtons:hover {
+    -fx-background-color: #0079ffa8;
+}
+
+.greenButtons {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+}
+
+.greenButtons:hover {
+    -fx-background-color: #28a745a8;
+}
+
+.redButtons {
+    -fx-background-color: #dc3545;
+    -fx-text-fill: white;
+}
+
+.redButtons:hover {
+    -fx-background-color: #dc3545a8;
+}
+
+.cyanButtons {
+    -fx-background-color: #00ffff80;
+    -fx-text-fill: white;
+}
+
+.cyanButtons:hover {
+    -fx-background-color: #008b8bbf;
+}
+
+.watermark {
+    -fx-font-size: 10px;
+    -fx-text-fill: #ffffff40;
+}

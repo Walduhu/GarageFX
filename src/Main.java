@@ -13,7 +13,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
-import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import java.io.*;
 import java.util.ArrayList;

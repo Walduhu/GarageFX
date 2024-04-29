@@ -596,8 +596,7 @@ public class Main extends Application {
                     } else {
                         int anzahlFahrzeuge = configEtage.getAnzahlGesamtParkplaetze() -
                                 configEtage.getAnzahlFreieParkplaetze();
-                        TextInputDialog anzahlParkplaetzeDialog =
-                                new TextInputDialog(String.valueOf(configEtage.getAnzahlGesamtParkplaetze()));
+                        TextInputDialog anzahlParkplaetzeDialog = new TextInputDialog(String.valueOf(configEtage.getAnzahlGesamtParkplaetze()));
                         anzahlParkplaetzeDialog.setTitle("Anzahl Parkplätze ändern");
                         anzahlParkplaetzeDialog.setHeaderText(null);
                         anzahlParkplaetzeDialog.setContentText("Geben Sie die neue Anzahl Parkplätze ein " +

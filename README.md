@@ -25,3 +25,33 @@ verfügt das Programm darüber hinaus über einen csv-Parser. Die Werte
 müssen in zwei csv-Dateien (fahrzeuge.csv und parketagen.csv im src-Ordner) jeweils durch Kommata 
 getrennt vorliegen. Wenn Änderungen der Daten vorgenommen werden, speichert das Programm diese
 beim Beenden in den csv-Dateien ab. Diese werden damit überschrieben.</p>
+
+<hr>
+
+# Anleitung zum Ausführen des Programms mit IntelliJ
+<ol>
+  <p>
+<li>) OpenJFX-SDK auf <a href="https://gluonhq.com/products/javafx/">https://gluonhq.com/products/javafx/</a> runterladen und auf Laufwerk C: entpacken </li>
+ </p>
+  <p>
+<li>) Normales Java Projekt erstellen </li>
+ </p>
+   <p>
+<li>) Erstellen Sie eine Bibliothek <br>
+Gehen Sie zu File -> Project Structure -> Libraries und fügen Sie das 
+SDK als Java-Bibliothek zu Ihrem Projekt hinzu. Zeigen Sie 
+auf den Ordner lib.</li> 
+</p>
+   <p>
+<li>) VM-Optionen hinzufügen <br>
+Die Programmausführung wirft Fehler. Um das Problem zu lösen, klicken Sie 
+mit rechts auf die Main.java -> Modify Run Configurations -> Modify 
+options. Fügen Sie folgendes den VM-Optionen hinzu:<br>
+
+--module-path "\path\to\javafx-sdk-xx\lib" --add-modules 
+javafx.controls,javafx.fxml <br>
+
+Ersetzen Sie „path/to/…“ durch den korrekten Pfad zur fx-Library und 
+zeigen sie auf den lib-Ordner. Beispiel: „C:\javafx-sdk-22\lib“ </li>
+</p>
+</ol>

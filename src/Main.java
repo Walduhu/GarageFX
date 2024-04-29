@@ -33,8 +33,8 @@ public class Main extends Application {
 
     // Initialisierung der Listen für Parketagen und Fahrzeuge
     public static ArrayList<Fahrzeug> alleFahrzeuge = importFahrzeugeFromCSV();
-    public static ArrayList<Fahrzeug> geloeschteFahrzeuge = new ArrayList<>();
     public static ArrayList<ParkEtage> alleParkEtagen = importParkEtagenFromCSV();
+    public static ArrayList<Fahrzeug> geloeschteFahrzeuge = new ArrayList<>();
 
     // Startmethode der JavaFX-Anwendung
     public static void main(String[] args) {

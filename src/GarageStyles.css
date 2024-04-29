@@ -4,6 +4,14 @@
     -fx-padding: 15px 15px 15px 15px;
 }
 
+.showScene {
+    -fx-text-fill: white;
+}
+.showScene .content {
+    -fx-background-color: #282828;
+    -fx-padding: 10px 10px 10px 10px;
+}
+
 .label1 {
     -fx-text-fill: white;
     -fx-font-size: 20px;

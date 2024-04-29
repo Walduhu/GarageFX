@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import java.io.*;
 import java.util.ArrayList;
@@ -35,6 +36,10 @@ public class Main extends Application {
     public static ArrayList<Fahrzeug> alleFahrzeuge = importFahrzeugeFromCSV();
     public static ArrayList<ParkEtage> alleParkEtagen = importParkEtagenFromCSV();
     public static ArrayList<Fahrzeug> geloeschteFahrzeuge = new ArrayList<>();
+
+    // Variablen für den css-Pfad und das Icon
+    private static final String cssPath = Objects.requireNonNull(Main.class.getResource("GarageStyles.css")).toExternalForm();
+    private static final Image carIcon = new Image(Objects.requireNonNull(Main.class.getResourceAsStream("car_icon.png")));
 
     // Startmethode der JavaFX-Anwendung
     public static void main(String[] args) {
@@ -139,8 +144,8 @@ public class Main extends Application {
         gridPane.setVgap(20);
 
         Scene scene = new Scene(gridPane, 975, 275);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("GarageStyles.css")).toExternalForm());
-        primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+        scene.getStylesheets().add(cssPath);
+        primaryStage.getIcons().add(carIcon);
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -222,7 +227,7 @@ public class Main extends Application {
                     // keine Übereinstimmungen gefunden
                     alert = new Alert(Alert.AlertType.WARNING);
                     Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-                    alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+                    alertStage.getIcons().add(carIcon);
                     alert.setHeaderText(null);
                     alert.setContentText("Es wurden keine Fahrzeug-Kennzeichen gefunden, die der Eingabe \"" +
                             suchEingabe.orElse("") + "\" entsprechen.");
@@ -233,7 +238,7 @@ public class Main extends Application {
                 if (suchEingabe.isPresent()) {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
                     Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-                    alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+                    alertStage.getIcons().add(carIcon);
                     alert.setHeaderText(null);
                     alert.setContentText("Die Sucheingabe darf nicht leer sein!");
                     alert.showAndWait();
@@ -244,57 +249,64 @@ public class Main extends Application {
         }
     }
 
-
     // Methode zum Anzeigen aller im Parkhaus geparkten Fahrzeuge
     private void zeigeFahrzeuge() {
-        if (!alleFahrzeuge.isEmpty()) {
-            StringBuilder contentTextBuilder = new StringBuilder();
+        StringBuilder fahrzeugDataBuilder = new StringBuilder();
 
-            for (Fahrzeug fahrzeug : alleFahrzeuge) {
-                contentTextBuilder.append(fahrzeug.printMe()).append("\n");
-            }
+        fahrzeugDataBuilder.append("Das Parkhaus enthält insgesamt ").
+                append(alleFahrzeuge.size()).append(" Fahrzeuge:\n\n");
 
-            contentTextBuilder.append("---------------------------------------------------" +
-                    "\nDas Parkhaus enthält insgesamt ").append(alleFahrzeuge.size()).append(" Fahrzeuge.");
-
-            Alert alert = getAlert();
-            alert.setTitle("Übersicht alle Fahrzeuge");
-            alert.setHeaderText(null);
-            alert.setContentText(contentTextBuilder.toString());
-            alert.showAndWait();
-        } else {
-            keineFahrzeuge();
+        for (Fahrzeug fahrzeug : alleFahrzeuge) {
+            fahrzeugDataBuilder.append(fahrzeug.printMe()).append("\n");
         }
+
+        TextArea fahrzeugTextArea = new TextArea(fahrzeugDataBuilder.toString());
+        fahrzeugTextArea.setEditable(false);
+        fahrzeugTextArea.getStyleClass().add("showScene");
+
+        Stage fahrzeugStage = new Stage();
+        fahrzeugStage.getIcons().add(carIcon);
+        fahrzeugStage.setTitle("Übersicht alle Fahrzeuge");
+        Scene fahrzeugScene = new Scene(fahrzeugTextArea, 350, 350);
+        fahrzeugScene.getStylesheets().add(cssPath);
+        fahrzeugStage.setScene(fahrzeugScene);
+        fahrzeugStage.show();
     }
 
     // Methode zum Anzeigen aller Parketagen im Parkhaus
     private void zeigeParkEtagen() {
-        if (!alleParkEtagen.isEmpty()) {
-            StringBuilder contentTextBuilder = new StringBuilder();
 
-            for (ParkEtage parkEtage : alleParkEtagen) {
-                contentTextBuilder.append(parkEtage.printMe()).append("\n");
+        if (!alleParkEtagen.isEmpty()) {
+            StringBuilder etageDataBuilder = new StringBuilder();
+
+            for (ParkEtage etage : alleParkEtagen) {
+                etageDataBuilder.append(etage.printMe()).append("\n");
             }
 
             int gesamtFreieParkplaetze = 0;
             int gesamtAnzahlParkplaetze = 0;
-
             for (ParkEtage etage : alleParkEtagen) {
                 gesamtFreieParkplaetze += etage.getAnzahlFreieParkplaetze();
                 gesamtAnzahlParkplaetze += etage.getAnzahlGesamtParkplaetze();
             }
 
-            contentTextBuilder.append("--------------------------------------------\n" +
-                    "Anzahl Fahrzeuge: ").append(alleFahrzeuge.size()).append("\n");
-            contentTextBuilder.append("Anzahl Etagen: ").append(alleParkEtagen.size()).append("\n");
-            contentTextBuilder.append("Gesamtanzahl freie Parkplätze: ").append(gesamtFreieParkplaetze)
+            etageDataBuilder.append("----------------------------------------------------------------\n\n");
+            etageDataBuilder.append("Anzahl Fahrzeuge: ").append(alleParkEtagen.size()).append("\n");
+            etageDataBuilder.append("Anzahl Etagen: ").append(alleParkEtagen.size()).append("\n");
+            etageDataBuilder.append("Gesamtanzahl freie Parkplätze: ").append(gesamtFreieParkplaetze)
                     .append(" / ").append(gesamtAnzahlParkplaetze);
 
-            Alert alert = getAlert();
-            alert.setTitle("Übersicht alle Park-Etagen");
-            alert.setHeaderText(null);
-            alert.setContentText(contentTextBuilder.toString());
-            alert.showAndWait();
+            TextArea etageTextArea = new TextArea(etageDataBuilder.toString());
+            etageTextArea.setEditable(false);
+            etageTextArea.getStyleClass().add("showScene");
+
+            Stage etageStage = new Stage();
+            etageStage.getIcons().add(carIcon);
+            etageStage.setTitle("Übersicht alle Park-Etagen");
+            Scene etageScene = new Scene(etageTextArea, 350, 350);
+            etageScene.getStylesheets().add(cssPath);
+            etageStage.setScene(etageScene);
+            etageStage.show();
         } else {
             keineEtagen();
         }
@@ -305,11 +317,10 @@ public class Main extends Application {
         boolean fahrzeugHinzugefuegt = false; // Hilfsvariable
 
         if (!alleParkEtagen.isEmpty()) {
-            ParkEtage etage = alleParkEtagen.getFirst(); // Nur eine Etage anzeigen, da die Eingabe unabhängig von der Etage ist
+            ParkEtage etage = alleParkEtagen.getFirst();
             if (etage.getAnzahlFreieParkplaetze() > 0) {
                 fahrzeugHinzugefuegt = true; // Aktualisierung der Hilfsvariable
 
-                // Code für das Hinzufügen eines Fahrzeugs hier
                 TextInputDialog dialog = getTextInputDialog();
                 dialog.setTitle("Fahrzeug fährt ins Parkhaus...");
                 dialog.setHeaderText(null);
@@ -385,7 +396,7 @@ public class Main extends Application {
         if (!fahrzeugHinzugefuegt) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-            alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+            alertStage.getIcons().add(carIcon);
             alert.setHeaderText(null);
             alert.setContentText("Fahrzeug abgelehnt. Es sind keine freien Parkplätze verfügbar." +
                     "\nBitte fügen Sie Park-Etagen zum Parkhaus hinzu.");
@@ -408,7 +419,7 @@ public class Main extends Application {
             dialog.setHeaderText(null);
             dialog.setContentText("Welches Fahrzeug möchten Sie aus dem Parkhaus entfernen?");
             Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
-            dialogStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+            dialogStage.getIcons().add(carIcon);
 
             Optional<String> result = dialog.showAndWait();
 
@@ -483,7 +494,7 @@ public class Main extends Application {
             dialog.setHeaderText(null);
             dialog.setContentText("Welche Etage möchten Sie aus dem Parkhaus entfernen?");
             Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
-            dialogStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+            dialogStage.getIcons().add(carIcon);
 
             Optional<String> result = dialog.showAndWait();
 
@@ -524,7 +535,7 @@ public class Main extends Application {
             alert.setTitle("Park-Etage konfigurieren");
             alert.setHeaderText(null);
             Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-            alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+            alertStage.getIcons().add(carIcon);
             alert.setContentText("Welche Etage möchten Sie konfigurieren?");
 
             // Erstellen der Liste für die Auswahl der Etage
@@ -537,18 +548,19 @@ public class Main extends Application {
             dialog.setHeaderText(null);
             dialog.setContentText("Welche Etage möchten Sie konfigurieren?");
             Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
-            dialogStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+            dialogStage.getIcons().add(carIcon);
             Optional<String> result = dialog.showAndWait();
 
             result.ifPresent(selectedEtage -> {
-                ParkEtage configEtage = alleParkEtagen.stream().filter(etage -> etage.getEtagenBezeichnung().equals(selectedEtage)).findFirst().orElse(null);
+                ParkEtage configEtage = alleParkEtagen.stream().filter(etage ->
+                        etage.getEtagenBezeichnung().equals(selectedEtage)).findFirst().orElse(null);
 
                 if (configEtage != null) {
                     TextInputDialog textInputDialog = new TextInputDialog(configEtage.getEtagenBezeichnung());
                     textInputDialog.setTitle("Bezeichnung ändern");
                     textInputDialog.setHeaderText(null);
                     Stage textInputStage1 = (Stage) textInputDialog.getDialogPane().getScene().getWindow();
-                    textInputStage1.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+                    textInputStage1.getIcons().add(carIcon);
                     textInputDialog.setContentText("Geben Sie die neue Bezeichnung der Etage ein:");
                     Optional<String> newBezeichnungResult = textInputDialog.showAndWait();
 
@@ -559,7 +571,7 @@ public class Main extends Application {
                         anzahlParkplaetzeDialog.setTitle("Anzahl Parkplätze ändern");
                         anzahlParkplaetzeDialog.setHeaderText(null);
                         Stage textInputStage2 = (Stage) anzahlParkplaetzeDialog.getDialogPane().getScene().getWindow();
-                        textInputStage2.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+                        textInputStage2.getIcons().add(carIcon);
                         anzahlParkplaetzeDialog.setContentText("Geben Sie die neue Anzahl der Parkplätze ein:");
                         Optional<String> newAnzahlParkplaetzeResult = anzahlParkplaetzeDialog.showAndWait();
 
@@ -587,7 +599,8 @@ public class Main extends Application {
                                     configEtage.setAnzahlGesamtParkplaetze(anzahlParkplaetze);
                                     configEtage.setAnzahlFreieParkplaetze(anzahlParkplaetze - anzahlFahrzeuge);
                                 } else {
-                                    showAlert(Alert.AlertType.WARNING, "Ungültige Eingabe", "Anzahl Parkplätze ist zu niedrig. Geben Sie mindestens " + anzahlFahrzeuge + " ein.");
+                                    showAlert(Alert.AlertType.WARNING, "Ungültige Eingabe",
+                                            "Anzahl Parkplätze ist zu niedrig. Geben Sie mindestens " + anzahlFahrzeuge + " ein.");
                                     configEtage();
                                 }
                             } catch (NumberFormatException e) {
@@ -610,7 +623,7 @@ public class Main extends Application {
         confirmDialog.setTitle("Bestätigung");
         confirmDialog.setHeaderText(null);
         Stage alertStage = (Stage) confirmDialog.getDialogPane().getScene().getWindow();
-        alertStage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("car_icon.png"))));
+        alertStage.getIcons().add(carIcon);
         confirmDialog.setContentText(loeschEtage.getAnzahlFreieParkplaetze() == loeschEtage.getAnzahlGesamtParkplaetze() ?
                 "Möchten Sie wirklich die leere Etage entfernen?" :
                 "Möchten Sie wirklich die Etage mitsamt der dort geparkten Fahrzeuge (Anzahl: " +
@@ -625,7 +638,7 @@ public class Main extends Application {
         alert.setTitle(title);
         alert.setHeaderText(null);
         Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+        alertStage.getIcons().add(carIcon);
         alert.setContentText(content);
         alert.showAndWait();
     }
@@ -635,7 +648,7 @@ public class Main extends Application {
     private void keineFahrzeuge() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+        alertStage.getIcons().add(carIcon);
         alert.setHeaderText(null);
         alert.setContentText("Es befinden sich noch keine Fahrzeuge im Parkhaus!");
         alert.showAndWait();
@@ -644,7 +657,7 @@ public class Main extends Application {
     private void keineEtagen() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+        alertStage.getIcons().add(carIcon);
         alert.setHeaderText(null);
         alert.setContentText("Das Parkhaus hat noch keine Etagen!");
         alert.showAndWait();
@@ -654,7 +667,7 @@ public class Main extends Application {
     private TextInputDialog getTextInputDialog() {
         TextInputDialog dialog = new TextInputDialog();
         Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
-        dialogStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+        dialogStage.getIcons().add(carIcon);
         return dialog;
     }
 
@@ -662,7 +675,7 @@ public class Main extends Application {
     private Alert getAlert() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        alertStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("car_icon.png"))));
+        alertStage.getIcons().add(carIcon);
         alert.setHeaderText(null);
         alert.setTitle("Information");
         return alert;

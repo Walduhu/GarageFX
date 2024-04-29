@@ -5,7 +5,7 @@
  * implementiert das Hauptfenster des Parkhaus-Management-Systems.
  *
  * @author Benjamin Schwarz
- * @version 28.04.24
+ * @version 29.04.24
  */
 
 import javafx.application.Application;
@@ -37,8 +37,10 @@ public class Main extends Application {
     public static ArrayList<Fahrzeug> geloeschteFahrzeuge = new ArrayList<>();
 
     // Variablen für den css-Pfad und das Icon
-    private static final String cssPath = Objects.requireNonNull(Main.class.getResource("GarageStyles.css")).toExternalForm();
-    private static final Image carIcon = new Image(Objects.requireNonNull(Main.class.getResourceAsStream("car_icon.png")));
+    private static final String cssPath = Objects.requireNonNull(Main.class.
+            getResource("GarageStyles.css")).toExternalForm();
+    private static final Image carIcon = new Image(Objects.
+            requireNonNull(Main.class.getResourceAsStream("car_icon.png")));
 
     // Startmethode der JavaFX-Anwendung
     public static void main(String[] args) {
@@ -212,10 +214,12 @@ public class Main extends Application {
                     if (kfz.getFahrzeugID().toLowerCase().contains(suchEingabe.get().toLowerCase())) {
                         if (!matchesGefunden) {
                             alert.setHeaderText(null);
-                            contentTextBuilder.append("Folgende Fahrzeuge, deren Kennzeichen der Eingabe \"").append(suchEingabe.get()).append("\" entsprechen, wurden gefunden:\n\n");
+                            contentTextBuilder.append("Folgende Fahrzeuge, deren Kennzeichen der Eingabe \"").
+                                    append(suchEingabe.get()).append("\" entsprechen, wurden gefunden:\n\n");
                             matchesGefunden = true; // Aktualisierung der Hilfsvariable
                         }
-                        contentTextBuilder.append(kfz.printMe()).append("\n"); // Hinzufügen des gefundenen Fahrzeugs zum StringBuilder
+                        // Hinzufügen des gefundenen Fahrzeugs zum StringBuilder
+                        contentTextBuilder.append(kfz.printMe()).append("\n");
                     }
                 }
 
@@ -364,7 +368,8 @@ public class Main extends Application {
                         // Überprüfen, ob die Position bereits von einem anderen Fahrzeug besetzt ist
                         int position = -1;
                         for (Fahrzeug geloeschtesFahrzeug : geloeschteFahrzeuge) {
-                            if (alleFahrzeuge.stream().noneMatch(fahrzeug -> fahrzeug.getPosition() == geloeschtesFahrzeug.getPosition()
+                            if (alleFahrzeuge.stream().noneMatch(fahrzeug ->
+                                    fahrzeug.getPosition() == geloeschtesFahrzeug.getPosition()
                                     && fahrzeug.getParkEtage().equals(geloeschtesFahrzeug.getParkEtage()))) {
                                 position = geloeschtesFahrzeug.getPosition();
                                 break;
@@ -376,7 +381,8 @@ public class Main extends Application {
                         }
 
                         Alert alert = getAlert();
-                        Fahrzeug neuesFahrzeug = new Fahrzeug(fahrzeugArt, kennzeichen, marke, rad, leistung, etage.getEtagenBezeichnung(), position);
+                        Fahrzeug neuesFahrzeug = new Fahrzeug(fahrzeugArt, kennzeichen, marke, rad,
+                                leistung, etage.getEtagenBezeichnung(), position);
                         alleFahrzeuge.add(neuesFahrzeug);
                         etage.setAnzahlFreieParkplaetze(etage.getAnzahlFreieParkplaetze() - 1);
                         alert.setContentText("Fahrzeug mit folgenden Daten erfolgreich eingeparkt:\n" +
@@ -430,7 +436,8 @@ public class Main extends Application {
                                 etage.setAnzahlFreieParkplaetze(etage.getAnzahlFreieParkplaetze() + 1);
                                 alleFahrzeuge.remove(fahrzeug);
                                 geloeschteFahrzeuge.add(fahrzeug);
-                                showAlert(Alert.AlertType.INFORMATION, "Information", "Fahrzeug erfolgreich ausgeparkt.");
+                                showAlert(Alert.AlertType.INFORMATION,
+                                        "Information", "Fahrzeug erfolgreich ausgeparkt.");
                                 break; // beenden der inneren Schleife, sobald eine Übereinstimmung gefunden wurde
                             }
                         }
@@ -517,7 +524,8 @@ public class Main extends Application {
                                 alleFahrzeuge.remove(i);
                             }
                         }
-                        showAlert(Alert.AlertType.INFORMATION, "Etage erfolgreich entfernt", "Etage erfolgreich entfernt.");
+                        showAlert(Alert.AlertType.INFORMATION,
+                                "Etage erfolgreich entfernt", "Etage erfolgreich entfernt.");
                     }
                 }
             });
@@ -566,7 +574,8 @@ public class Main extends Application {
                     newBezeichnungResult.ifPresent(configEtage::setEtagenBezeichnung);
 
                     if (configEtage.getAnzahlFreieParkplaetze() == configEtage.getAnzahlGesamtParkplaetze()) {
-                        TextInputDialog anzahlParkplaetzeDialog = new TextInputDialog(String.valueOf(configEtage.getAnzahlGesamtParkplaetze()));
+                        TextInputDialog anzahlParkplaetzeDialog =
+                                new TextInputDialog(String.valueOf(configEtage.getAnzahlGesamtParkplaetze()));
                         anzahlParkplaetzeDialog.setTitle("Anzahl Parkplätze ändern");
                         anzahlParkplaetzeDialog.setHeaderText(null);
                         Stage textInputStage2 = (Stage) anzahlParkplaetzeDialog.getDialogPane().getScene().getWindow();
@@ -580,15 +589,19 @@ public class Main extends Application {
                                 configEtage.setAnzahlGesamtParkplaetze(anzahlParkplaetze);
                                 configEtage.setAnzahlFreieParkplaetze(anzahlParkplaetze);
                             } catch (NumberFormatException e) {
-                                showAlert(Alert.AlertType.ERROR, "Fehler", "Ungültige Eingabe. Bitte geben Sie eine Zahl ein.");
+                                showAlert(Alert.AlertType.ERROR,
+                                        "Fehler", "Ungültige Eingabe. Bitte geben Sie eine Zahl ein.");
                             }
                         });
                     } else {
-                        int anzahlFahrzeuge = configEtage.getAnzahlGesamtParkplaetze() - configEtage.getAnzahlFreieParkplaetze();
-                        TextInputDialog anzahlParkplaetzeDialog = new TextInputDialog(String.valueOf(configEtage.getAnzahlGesamtParkplaetze()));
+                        int anzahlFahrzeuge = configEtage.getAnzahlGesamtParkplaetze() -
+                                configEtage.getAnzahlFreieParkplaetze();
+                        TextInputDialog anzahlParkplaetzeDialog =
+                                new TextInputDialog(String.valueOf(configEtage.getAnzahlGesamtParkplaetze()));
                         anzahlParkplaetzeDialog.setTitle("Anzahl Parkplätze ändern");
                         anzahlParkplaetzeDialog.setHeaderText(null);
-                        anzahlParkplaetzeDialog.setContentText("Geben Sie die neue Anzahl Parkplätze ein (Es sind " + anzahlFahrzeuge + " Fahrzeuge geparkt):");
+                        anzahlParkplaetzeDialog.setContentText("Geben Sie die neue Anzahl Parkplätze ein " +
+                                "(Es sind " + anzahlFahrzeuge + " Fahrzeuge geparkt):");
                         Optional<String> newAnzahlParkplaetzeResult = anzahlParkplaetzeDialog.showAndWait();
 
                         newAnzahlParkplaetzeResult.ifPresent(newAnzahl -> {
@@ -599,11 +612,13 @@ public class Main extends Application {
                                     configEtage.setAnzahlFreieParkplaetze(anzahlParkplaetze - anzahlFahrzeuge);
                                 } else {
                                     showAlert(Alert.AlertType.WARNING, "Ungültige Eingabe",
-                                            "Anzahl Parkplätze ist zu niedrig. Geben Sie mindestens " + anzahlFahrzeuge + " ein.");
+                                            "Anzahl Parkplätze ist zu niedrig. Geben Sie mindestens " +
+                                                    anzahlFahrzeuge + " ein.");
                                     configEtage();
                                 }
                             } catch (NumberFormatException e) {
-                                showAlert(Alert.AlertType.ERROR, "Fehler", "Ungültige Eingabe. Bitte geben Sie eine Zahl ein.");
+                                showAlert(Alert.AlertType.ERROR,
+                                        "Fehler", "Ungültige Eingabe. Bitte geben Sie eine Zahl ein.");
                             }
                         });
                     }
@@ -623,7 +638,8 @@ public class Main extends Application {
         confirmDialog.setHeaderText(null);
         Stage alertStage = (Stage) confirmDialog.getDialogPane().getScene().getWindow();
         alertStage.getIcons().add(carIcon);
-        confirmDialog.setContentText(loeschEtage.getAnzahlFreieParkplaetze() == loeschEtage.getAnzahlGesamtParkplaetze() ?
+        confirmDialog.setContentText(loeschEtage.getAnzahlFreieParkplaetze() ==
+                loeschEtage.getAnzahlGesamtParkplaetze() ?
                 "Möchten Sie wirklich die leere Etage entfernen?" :
                 "Möchten Sie wirklich die Etage mitsamt der dort geparkten Fahrzeuge (Anzahl: " +
                         (loeschEtage.getAnzahlGesamtParkplaetze() - loeschEtage.getAnzahlFreieParkplaetze()) +

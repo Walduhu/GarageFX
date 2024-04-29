@@ -4,7 +4,7 @@
  * Klasse zum Erzeugen von Fahrzeugen
  *
  * @author Benjamin Schwarz
- * @version 28.04.24
+ * @version 29.04.24
  */
 
 public class Fahrzeug extends Main {
@@ -62,19 +62,21 @@ public class Fahrzeug extends Main {
     // Ausgabe der Attribute eines Fahrzeug-Objekts
     public String printMe() {
         return "Kennzeichen: " + getFahrzeugID() + "\nFahrzeugart: " + getFahrzeugArt() +
-                "\nMarke: " + getMarkenName() + "\nAnzahl Räder: " + getAnzahlRaeder() + "\nLeistung: " + getLeistung() + " kW" +
-                "\nPark-Etage: " + getParkEtage() + "\nPosition: " + getPosition() + "\n";
+                "\nMarke: " + getMarkenName() + "\nAnzahl Räder: " + getAnzahlRaeder() + "\nLeistung: " +
+                getLeistung() + " kW" + "\nPark-Etage: " + getParkEtage() + "\nPosition: " + getPosition() + "\n";
     }
 
     // Methode zur Konvertierung des Fahrzeugs in CSV-Format
     public String toCSVFormat() {
-        return String.format("%s,%s,%s,%d,%d,%s,%d", fahrzeugArt, fahrzeugID, markenName, anzahlRaeder, leistung, parkEtage, position);
+        return String.format("%s,%s,%s,%d,%d,%s,%d", fahrzeugArt, fahrzeugID, markenName,
+                anzahlRaeder, leistung, parkEtage, position);
     }
 
     // Methode zum Parsen einer Zeile aus der CSV-Datei in ein Fahrzeug-Objekt
     public static Fahrzeug parseCSVLine(String line) {
         String[] parts = line.split(",");
-        return new Fahrzeug(parts[0], parts[1], parts[2], Integer.parseInt(parts[3]), Integer.parseInt(parts[4]), parts[5], Integer.parseInt(parts[6]));
+        return new Fahrzeug(parts[0], parts[1], parts[2], Integer.parseInt(parts[3]),
+                Integer.parseInt(parts[4]), parts[5], Integer.parseInt(parts[6]));
     }
 }
 

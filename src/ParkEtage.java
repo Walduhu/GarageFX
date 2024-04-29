@@ -4,7 +4,7 @@
  * Klasse zum Erzeugen von Park-Etagen
  *
  * @author Benjamin Schwarz
- * @version 28.04.24
+ * @version 29.04.24
  */
 
 public class ParkEtage extends Main{
@@ -13,7 +13,8 @@ public class ParkEtage extends Main{
     private int anzahlFreieParkplaetze;
     private int anzahlGesamtParkplaetze;
 
-    public ParkEtage(String etagenBezeichnung, int anzahlFreieParkplaetze, int anzahlGesamtParkplaetze) {
+    public ParkEtage(String etagenBezeichnung,
+                     int anzahlFreieParkplaetze, int anzahlGesamtParkplaetze) {
         this.etagenBezeichnung = etagenBezeichnung;
         this.anzahlFreieParkplaetze = anzahlFreieParkplaetze;
         this.anzahlGesamtParkplaetze = anzahlGesamtParkplaetze;
@@ -46,7 +47,8 @@ public class ParkEtage extends Main{
     // Ausgabe der Attribute eines ParkEtage-Objekts
     public String printMe() {
         return "Bezeichnung: " + getEtagenBezeichnung() +
-                "\nAnzahl freie Parkplätze: " + getAnzahlFreieParkplaetze() + " / " + getAnzahlGesamtParkplaetze() + "\n";
+                "\nAnzahl freie Parkplätze: " +
+                getAnzahlFreieParkplaetze() + " / " + getAnzahlGesamtParkplaetze() + "\n";
 
     }
 

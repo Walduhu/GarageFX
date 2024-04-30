@@ -202,34 +202,41 @@ public class Main extends Application {
 
             dialog.setTitle("Fahrzeug suchen");
             dialog.setHeaderText(null);
-            dialog.setContentText("Bitte geben Sie ein Kennzeichen\noder Teile eines Kennzeichens ein:");
+            dialog.setContentText("Bitte geben Sie ein Kennzeichen oder Teile eines Kennzeichens ein:");
             Optional<String> suchEingabe = dialog.showAndWait();
 
             if (suchEingabe.isPresent() && !suchEingabe.get().isEmpty()) {
-                Alert alert = getAlert();
-                StringBuilder contentTextBuilder = new StringBuilder(); // StringBuilder für gefundene Fahrzeuge
+                StringBuilder suchDataBuilder = new StringBuilder(); // StringBuilder für gefundene Fahrzeuge
                 boolean matchesGefunden = false; // Hilfsvariable für Suchstatus
 
                 for (Fahrzeug kfz : alleFahrzeuge) {
                     // Kennzeichen in Kleinbuchstaben umwandeln und prüfen, ob es die Sucheingabe enthält
                     if (kfz.getFahrzeugID().toLowerCase().contains(suchEingabe.get().toLowerCase())) {
                         if (!matchesGefunden) {
-                            alert.setHeaderText(null);
-                            contentTextBuilder.append("Folgende Fahrzeuge, deren Kennzeichen der Eingabe \"").
-                                    append(suchEingabe.get()).append("\" entsprechen, wurden gefunden:\n\n");
                             matchesGefunden = true; // Aktualisierung der Hilfsvariable
+                            suchDataBuilder.append("Folgende Fahrzeuge, deren Kennzeichen\nder Eingabe \"")
+                                    .append(suchEingabe.get()).append("\" entsprechen, wurden gefunden:\n\n");
                         }
                         // Hinzufügen des gefundenen Fahrzeugs zum StringBuilder
-                        contentTextBuilder.append(kfz.printMe()).append("\n");
+                        suchDataBuilder.append(kfz.printMe()).append("\n");
                     }
                 }
 
                 if (matchesGefunden) {
-                    alert.setContentText(contentTextBuilder + "\n\n"); // Anzeigen der gefundenen Fahrzeuge
-                    alert.showAndWait();
+                    TextArea suchTextArea = new TextArea(suchDataBuilder.toString());
+                    suchTextArea.setEditable(false);
+                    suchTextArea.getStyleClass().add("showScene");
+
+                    Stage suchStage = new Stage();
+                    suchStage.getIcons().add(carIcon);
+                    suchStage.setTitle("Gefundene Fahrzeuge");
+                    Scene suchScene = new Scene(suchTextArea, 350, 350);
+                    suchScene.getStylesheets().add(cssPath);
+                    suchStage.setScene(suchScene);
+                    suchStage.show();
                 } else {
                     // keine Übereinstimmungen gefunden
-                    alert = new Alert(Alert.AlertType.WARNING);
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
                     Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
                     alertStage.getIcons().add(carIcon);
                     alert.setHeaderText(null);
@@ -253,6 +260,7 @@ public class Main extends Application {
         }
     }
 
+
     // Methode zum Anzeigen aller im Parkhaus geparkten Fahrzeuge
     private void zeigeFahrzeuge() {
 
@@ -260,10 +268,10 @@ public class Main extends Application {
             StringBuilder fahrzeugDataBuilder = new StringBuilder();
 
             if (alleFahrzeuge.size() > 1) {
-                fahrzeugDataBuilder.append("Es parken gerade ").
-                        append(alleFahrzeuge.size()).append(" Fahrzeuge:\n\n");
+                fahrzeugDataBuilder.append("Es befinden sich gerade ").
+                        append(alleFahrzeuge.size()).append(" Fahrzeuge im Parkhaus:\n\n");
             } else {
-                fahrzeugDataBuilder.append("Es parkt gerade 1 Fahrzeug:\n\n");
+                fahrzeugDataBuilder.append("Es befindet sich gerade 1 Fahrzeug im Parkhaus:\n\n");
             }
 
             for (Fahrzeug fahrzeug : alleFahrzeuge) {

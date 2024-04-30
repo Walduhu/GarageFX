@@ -225,7 +225,7 @@ public class Main extends Application {
                 }
 
                 if (matchesGefunden) {
-                    alert.setContentText(contentTextBuilder.toString()); // Anzeigen der gefundenen Fahrzeuge
+                    alert.setContentText(contentTextBuilder + "\n\n"); // Anzeigen der gefundenen Fahrzeuge
                     alert.showAndWait();
                 } else {
                     // keine Übereinstimmungen gefunden
@@ -234,7 +234,7 @@ public class Main extends Application {
                     alertStage.getIcons().add(carIcon);
                     alert.setHeaderText(null);
                     alert.setContentText("Es wurden keine Fahrzeug-Kennzeichen gefunden, die der Eingabe \"" +
-                            suchEingabe + "\" entsprechen.");
+                            suchEingabe.orElse("") + "\" entsprechen.");
                     alert.showAndWait();
                 }
             } else {

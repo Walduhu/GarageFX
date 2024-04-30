@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -233,7 +234,7 @@ public class Main extends Application {
                     alertStage.getIcons().add(carIcon);
                     alert.setHeaderText(null);
                     alert.setContentText("Es wurden keine Fahrzeug-Kennzeichen gefunden, die der Eingabe \"" +
-                            suchEingabe.orElse("") + "\" entsprechen.");
+                            suchEingabe + "\" entsprechen.");
                     alert.showAndWait();
                 }
             } else {
@@ -254,26 +255,35 @@ public class Main extends Application {
 
     // Methode zum Anzeigen aller im Parkhaus geparkten Fahrzeuge
     private void zeigeFahrzeuge() {
-        StringBuilder fahrzeugDataBuilder = new StringBuilder();
 
-        fahrzeugDataBuilder.append("Das Parkhaus enthält insgesamt ").
-                append(alleFahrzeuge.size()).append(" Fahrzeuge:\n\n");
+        if (!alleFahrzeuge.isEmpty()) {
+            StringBuilder fahrzeugDataBuilder = new StringBuilder();
 
-        for (Fahrzeug fahrzeug : alleFahrzeuge) {
-            fahrzeugDataBuilder.append(fahrzeug.printMe()).append("\n");
+            if (alleFahrzeuge.size() > 1) {
+                fahrzeugDataBuilder.append("Es parken gerade ").
+                        append(alleFahrzeuge.size()).append(" Fahrzeuge:\n\n");
+            } else {
+                fahrzeugDataBuilder.append("Es parkt gerade 1 Fahrzeug:\n\n");
+            }
+
+            for (Fahrzeug fahrzeug : alleFahrzeuge) {
+                fahrzeugDataBuilder.append(fahrzeug.printMe()).append("\n");
+            }
+
+            TextArea fahrzeugTextArea = new TextArea(fahrzeugDataBuilder.toString());
+            fahrzeugTextArea.setEditable(false);
+            fahrzeugTextArea.getStyleClass().add("showScene");
+
+            Stage fahrzeugStage = new Stage();
+            fahrzeugStage.getIcons().add(carIcon);
+            fahrzeugStage.setTitle("Übersicht alle Fahrzeuge");
+            Scene fahrzeugScene = new Scene(fahrzeugTextArea, 350, 350);
+            fahrzeugScene.getStylesheets().add(cssPath);
+            fahrzeugStage.setScene(fahrzeugScene);
+            fahrzeugStage.show();
+        } else {
+            keineFahrzeuge();
         }
-
-        TextArea fahrzeugTextArea = new TextArea(fahrzeugDataBuilder.toString());
-        fahrzeugTextArea.setEditable(false);
-        fahrzeugTextArea.getStyleClass().add("showScene");
-
-        Stage fahrzeugStage = new Stage();
-        fahrzeugStage.getIcons().add(carIcon);
-        fahrzeugStage.setTitle("Übersicht alle Fahrzeuge");
-        Scene fahrzeugScene = new Scene(fahrzeugTextArea, 350, 350);
-        fahrzeugScene.getStylesheets().add(cssPath);
-        fahrzeugStage.setScene(fahrzeugScene);
-        fahrzeugStage.show();
     }
 
     // Methode zum Anzeigen aller Parketagen im Parkhaus
@@ -294,7 +304,7 @@ public class Main extends Application {
             }
 
             etageDataBuilder.append("----------------------------------------------------------------\n\n");
-            etageDataBuilder.append("Anzahl Fahrzeuge: ").append(alleParkEtagen.size()).append("\n");
+            etageDataBuilder.append("Anzahl Fahrzeuge: ").append(alleFahrzeuge.size()).append("\n");
             etageDataBuilder.append("Anzahl Etagen: ").append(alleParkEtagen.size()).append("\n");
             etageDataBuilder.append("Gesamtanzahl freie Parkplätze: ").append(gesamtFreieParkplaetze)
                     .append(" / ").append(gesamtAnzahlParkplaetze);
@@ -370,7 +380,7 @@ public class Main extends Application {
                         for (Fahrzeug geloeschtesFahrzeug : geloeschteFahrzeuge) {
                             if (alleFahrzeuge.stream().noneMatch(fahrzeug ->
                                     fahrzeug.getPosition() == geloeschtesFahrzeug.getPosition()
-                                    && fahrzeug.getParkEtage().equals(geloeschtesFahrzeug.getParkEtage()))) {
+                                            && fahrzeug.getParkEtage().equals(geloeschtesFahrzeug.getParkEtage()))) {
                                 position = geloeschtesFahrzeug.getPosition();
                                 break;
                             }
@@ -630,7 +640,7 @@ public class Main extends Application {
     }
 
 
-    // Hilfsmethode zur Erstellung eines Bestätigungsdialogs
+    // Hilfsmethode zur Erstellung eines Bestätigungsdialogs in deleteEtage()
     private static Alert getConfirmDialog(ParkEtage loeschEtage) {
         Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
         confirmDialog.setTitle("Bestätigung");
@@ -664,7 +674,7 @@ public class Main extends Application {
         Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
         alertStage.getIcons().add(carIcon);
         alert.setHeaderText(null);
-        alert.setContentText("Es befinden sich noch keine Fahrzeuge im Parkhaus!");
+        alert.setContentText("Es befinden sich keine Fahrzeuge im Parkhaus!\nBitte fügen Sie welche hinzu.");
         alert.showAndWait();
     }
 
@@ -673,7 +683,7 @@ public class Main extends Application {
         Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
         alertStage.getIcons().add(carIcon);
         alert.setHeaderText(null);
-        alert.setContentText("Das Parkhaus hat noch keine Etagen!");
+        alert.setContentText("Das Parkhaus hat keine Etagen!\nBitte fügen Sie welche hinzu.");
         alert.showAndWait();
     }
 

@@ -7,7 +7,7 @@
  * @version 29.04.24
  */
 
-public class ParkEtage extends Main{
+public class ParkEtage extends Main {
 
     private String etagenBezeichnung; // z.B. EG, 2.UG, 5.OG
     private int anzahlFreieParkplaetze;

@@ -5,7 +5,7 @@
  * implementiert das Hauptfenster des Parkhaus-Management-Systems.
  *
  * @author Benjamin Schwarz
- * @version 29.04.24
+ * @version 30.04.24
  */
 
 import javafx.application.Application;
@@ -115,7 +115,7 @@ public class Main extends Application {
         Label label = new Label("Willkommen im Parkhaus der Stadt Vence");
         label.getStyleClass().add("label1");
 
-        Label watermarkLabel = new Label("\n© 2024 Benjamin Schwarz");
+        Label watermarkLabel = new Label("© 2024 Benjamin Schwarz");
         watermarkLabel.getStyleClass().add("watermark");
 
         Button button1 = createButton("Fahrzeug einparken", "greenButtons");
@@ -131,7 +131,7 @@ public class Main extends Application {
         gridPane.getStyleClass().add("scene");
 
         gridPane.add(label, 0, 0, 3, 1);
-        gridPane.add(watermarkLabel, 0, 4, 1, 1);
+        gridPane.add(watermarkLabel, 0, 5, 1, 1);
 
         gridPane.add(button1, 0, 2);
         gridPane.add(button2, 0, 3);
@@ -145,7 +145,7 @@ public class Main extends Application {
         gridPane.setHgap(20);
         gridPane.setVgap(20);
 
-        Scene scene = new Scene(gridPane, 975, 275);
+        Scene scene = new Scene(gridPane, 1000, 310);
         scene.getStylesheets().add(cssPath);
         primaryStage.getIcons().add(carIcon);
 
@@ -383,7 +383,7 @@ public class Main extends Application {
                             .anyMatch(fahrzeug -> fahrzeug.getFahrzeugID().equalsIgnoreCase(kennzeichen));
 
                     if (!kennzeichenExistiert) {
-                        // Überprüfen, ob die Position bereits von einem anderen Fahrzeug besetzt ist
+                        // überprüfen, ob die Position bereits von einem anderen Fahrzeug besetzt ist
                         int position = -1;
                         for (Fahrzeug geloeschtesFahrzeug : geloeschteFahrzeuge) {
                             if (alleFahrzeuge.stream().noneMatch(fahrzeug ->

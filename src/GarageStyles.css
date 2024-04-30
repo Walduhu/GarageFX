@@ -1,7 +1,7 @@
 .scene {
     -fx-background-color: #282828;
     -fx-text-fill: white;
-    -fx-padding: 15px 15px 15px 15px;
+    -fx-padding: 25px 25px 25px 25px;
 }
 
 .showScene {
@@ -9,7 +9,7 @@
 }
 .showScene .content {
     -fx-background-color: #282828;
-    -fx-padding: 10px 10px 10px 10px;
+    -fx-padding: 15px 15px 15px 15px;
 }
 
 .label1 {

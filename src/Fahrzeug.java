@@ -4,7 +4,7 @@
  * Klasse zum Erzeugen von Fahrzeugen
  *
  * @author Benjamin Schwarz
- * @version 29.04.24
+ * @version 30.04.24
  */
 
 public class Fahrzeug extends Main {

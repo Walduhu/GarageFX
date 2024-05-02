@@ -5,7 +5,7 @@
  * implementiert das Hauptfenster des Parkhaus-Management-Systems.
  *
  * @author Benjamin Schwarz
- * @version 30.04.24
+ * @version 03.05.24
  */
 
 import javafx.application.Application;
@@ -532,7 +532,17 @@ public class Main extends Application {
                 }
 
                 if (loeschEtage != null) {
-                    Alert confirmDialog = getConfirmDialog(loeschEtage);
+                    Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmDialog.setTitle("Bestätigung");
+                    confirmDialog.setHeaderText(null);
+                    Stage alertStage = (Stage) confirmDialog.getDialogPane().getScene().getWindow();
+                    alertStage.getIcons().add(carIcon);
+                    confirmDialog.setContentText(loeschEtage.getAnzahlFreieParkplaetze() ==
+                            loeschEtage.getAnzahlGesamtParkplaetze() ?
+                            "Möchten Sie wirklich die leere Etage entfernen?" :
+                            "Möchten Sie wirklich die Etage mitsamt der dort geparkten Fahrzeuge (Anzahl: " +
+                                    (loeschEtage.getAnzahlGesamtParkplaetze() -
+                                            loeschEtage.getAnzahlFreieParkplaetze()) + ") löschen?");
                     Optional<ButtonType> confirmResult = confirmDialog.showAndWait();
                     if (confirmResult.isPresent() && confirmResult.get() == ButtonType.OK) {
                         alleParkEtagen.remove(loeschEtage);
@@ -647,23 +657,6 @@ public class Main extends Application {
         }
     }
 
-
-    // Hilfsmethode zur Erstellung eines Bestätigungsdialogs in deleteEtage()
-    private static Alert getConfirmDialog(ParkEtage loeschEtage) {
-        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmDialog.setTitle("Bestätigung");
-        confirmDialog.setHeaderText(null);
-        Stage alertStage = (Stage) confirmDialog.getDialogPane().getScene().getWindow();
-        alertStage.getIcons().add(carIcon);
-        confirmDialog.setContentText(loeschEtage.getAnzahlFreieParkplaetze() ==
-                loeschEtage.getAnzahlGesamtParkplaetze() ?
-                "Möchten Sie wirklich die leere Etage entfernen?" :
-                "Möchten Sie wirklich die Etage mitsamt der dort geparkten Fahrzeuge (Anzahl: " +
-                        (loeschEtage.getAnzahlGesamtParkplaetze() - loeschEtage.getAnzahlFreieParkplaetze()) +
-                        ") löschen?");
-        return confirmDialog;
-    }
-
     // Hilfsmethode zur Anzeige von Dialogen unterschiedlicher Typen
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
@@ -713,4 +706,3 @@ public class Main extends Application {
         return alert;
     }
 }
-

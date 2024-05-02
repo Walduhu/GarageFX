@@ -337,8 +337,7 @@ public class Main extends Application {
     private void addFahrzeug() {
         boolean fahrzeugHinzugefuegt = false; // Hilfsvariable
 
-        if (!alleParkEtagen.isEmpty()) {
-            ParkEtage etage = alleParkEtagen.getFirst();
+        for (ParkEtage etage : alleParkEtagen) {
             if (etage.getAnzahlFreieParkplaetze() > 0) {
                 fahrzeugHinzugefuegt = true; // Aktualisierung der Hilfsvariable
 
@@ -413,6 +412,7 @@ public class Main extends Application {
                                 "\nFahrzeug kann nicht ins Parkhaus einparken.");
                     }
                 });
+                break; // Schleife wird nach Hinzufügen eines Fahrzeugs verlassen
             }
         }
 

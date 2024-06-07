@@ -1,4 +1,4 @@
-# GarageFX - Eine einfache JavaFX-Anwendung zum Erstellen und Verwalten eines Parkhauses
+# GarageFX - Eine JavaFX-Anwendung zum Erstellen und Verwalten eines Parkhauses
 
 <p>Die fiktive Stadt Vence hat den Programmierer mit der Implementierung eines Parkhaus-Simulationsprogramms beauftragt.
 </p>
